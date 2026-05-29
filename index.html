@@ -232,9 +232,96 @@ tr.canceled td{opacity:.5;text-decoration:line-through}
   body.printing-patient .prepaid-actions { display: none !important; }
   body.printing-patient .btn { display: none !important; }
 }
+
+/* ログイン画面 */
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #FFF8F0 0%, #FEF3E7 100%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.login-overlay.hidden { display: none; }
+.login-box {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 40px 36px;
+  max-width: 380px;
+  width: 100%;
+  box-shadow: 0 8px 40px rgba(245,168,78,0.25);
+  text-align: center;
+}
+.login-logo {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+.login-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--sun-deep);
+  margin-bottom: 6px;
+}
+.login-subtitle {
+  font-size: .85rem;
+  color: var(--text-sub);
+  margin-bottom: 28px;
+}
+.login-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 1.1rem;
+  text-align: center;
+  letter-spacing: 4px;
+  margin-bottom: 16px;
+  transition: border-color .2s;
+}
+.login-input:focus {
+  outline: none;
+  border-color: var(--sun);
+  box-shadow: 0 0 0 3px rgba(245,168,78,0.15);
+}
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--sun);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s;
+}
+.login-btn:hover { background: var(--sun-dark); }
+.login-error {
+  color: var(--red);
+  font-size: .85rem;
+  margin-top: 10px;
+  min-height: 20px;
+}
 </style>
 </head>
 <body>
+
+<!-- ログイン画面 -->
+<div class="login-overlay" id="login-overlay">
+  <div class="login-box">
+    <div class="login-logo">☀️</div>
+    <div class="login-title">たいよう管理画面</div>
+    <div class="login-subtitle">整骨鍼灸院たいよう</div>
+    <input type="password" class="login-input" id="login-password"
+      placeholder="パスワード"
+      onkeydown="if(event.key==='Enter') checkLogin()">
+    <button class="login-btn" onclick="checkLogin()">ログイン</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
 
 <header class="header">
   <div class="header-inner">
@@ -942,6 +1029,7 @@ const APP = {
 // 初期化
 // =============================================
 document.addEventListener('DOMContentLoaded', () => {
+  initLogin();
   const t = todayStr();
   document.getElementById('pay-date').value = t;
   document.getElementById('use-date').value = t;
@@ -2471,6 +2559,42 @@ async function savePaymentMethod() {
     await loadPaymentMethodsList();
     loadPaymentMethodsMaster();
   } catch(e) { showToast(e.message,'error'); }
+}
+
+// =============================================
+// ログイン機能
+// =============================================
+const CORRECT_PASSWORD = '209358';
+const SESSION_KEY = 'taiyou_session';
+
+function checkLogin() {
+  const input = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  if (input === CORRECT_PASSWORD) {
+    // セッション保存（タブを閉じるまで有効）
+    sessionStorage.setItem(SESSION_KEY, 'ok');
+    document.getElementById('login-overlay').classList.add('hidden');
+    errEl.textContent = '';
+    document.getElementById('login-password').value = '';
+  } else {
+    errEl.textContent = 'パスワードが違います';
+    document.getElementById('login-password').value = '';
+    document.getElementById('login-password').focus();
+    // 入力欄を揺らす
+    const inp = document.getElementById('login-password');
+    inp.style.borderColor = 'var(--red)';
+    setTimeout(() => inp.style.borderColor = '', 1000);
+  }
+}
+
+function initLogin() {
+  // セッションが有効なら即ログイン
+  if (sessionStorage.getItem(SESSION_KEY) === 'ok') {
+    document.getElementById('login-overlay').classList.add('hidden');
+  } else {
+    document.getElementById('login-overlay').classList.remove('hidden');
+    setTimeout(() => document.getElementById('login-password').focus(), 100);
+  }
 }
 </script>
 </body>

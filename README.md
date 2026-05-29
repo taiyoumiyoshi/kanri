@@ -1,0 +1,2478 @@
+[index.html](https://github.com/user-attachments/files/28375901/index.html)
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>整骨鍼灸院たいよう｜管理システム</title>
+<style>
+:root {
+  --sun:#F5A84E;--sun-light:#FEF3E7;--sun-bg:#FFF8F0;--sun-dark:#D97B30;--sun-deep:#B35F00;
+  --text:#3D3D3D;--text-sub:#7A7A7A;--white:#FFFFFF;--border:#E8D5BE;
+  --shadow:0 2px 12px rgba(245,168,78,.15);--shadow-card:0 4px 20px rgba(0,0,0,.08);
+  --red:#E05555;--red-light:#FFF0F0;--green:#2DAF7F;--green-light:#EDFAF4;
+  --blue:#3B82C4;--blue-light:#EBF3FD;--purple:#7B5EDB;--purple-light:#F0EBFF;
+  --radius:14px;--radius-sm:8px;
+  --font:'Noto Sans JP','Hiragino Sans','Yu Gothic',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{font-family:var(--font);background:var(--sun-bg);color:var(--text);min-height:100vh;padding-bottom:40px}
+a{color:inherit;text-decoration:none}
+input,select,textarea,button{font-family:var(--font)}
+
+/* ヘッダー */
+.header{background:var(--white);border-bottom:3px solid var(--sun);padding:0 20px;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(245,168,78,.2)}
+.header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px;height:60px}
+.logo{display:flex;align-items:center;gap:10px;font-size:1.15rem;font-weight:700;color:var(--sun-deep);cursor:pointer;flex-shrink:0}
+.logo-icon{font-size:1.5rem}
+.header-nav{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.nav-btn{padding:6px 12px;border-radius:20px;border:2px solid var(--sun);background:transparent;color:var(--sun-deep);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.nav-btn:hover,.nav-btn.active{background:var(--sun);color:var(--white)}
+.gas-status{font-size:.75rem;padding:3px 8px;border-radius:20px;background:#eee;color:#888;white-space:nowrap;flex-shrink:0}
+.gas-status.ok{background:var(--green-light);color:var(--green)}
+.gas-status.err{background:var(--red-light);color:var(--red)}
+
+/* メイン */
+.main{max-width:1100px;margin:0 auto;padding:24px 16px}
+.page{display:none}
+.page.active{display:block}
+
+/* 設定バナー */
+.setup-banner{background:var(--blue-light);border:2px solid var(--blue);border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.setup-banner p{flex:1;font-size:.9rem;color:var(--blue)}
+.setup-banner input{flex:2;min-width:200px;padding:8px 12px;border:2px solid var(--blue);border-radius:var(--radius-sm);font-size:.9rem}
+.btn-save-url{padding:8px 18px;background:var(--blue);color:var(--white);border:none;border-radius:var(--radius-sm);font-weight:700;cursor:pointer;white-space:nowrap}
+
+/* カード */
+.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-card);padding:24px;margin-bottom:20px}
+.card-title{font-size:1.1rem;font-weight:700;color:var(--sun-deep);margin-bottom:18px;display:flex;align-items:center;gap:8px;padding-bottom:12px;border-bottom:2px solid var(--sun-light)}
+
+/* フォーム */
+.form-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.form-group{display:flex;flex-direction:column;gap:6px;flex:1;min-width:160px}
+.form-group.wide{min-width:260px}
+label{font-size:.82rem;font-weight:700;color:var(--sun-dark)}
+input[type=text],input[type=number],input[type=date],select,textarea{padding:11px 14px;border:2px solid var(--border);border-radius:var(--radius-sm);font-size:1rem;color:var(--text);background:var(--white);transition:border-color .2s;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--sun);box-shadow:0 0 0 3px rgba(245,168,78,.15)}
+textarea{resize:vertical;min-height:80px}
+
+/* ボタン */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:12px 22px;border-radius:var(--radius-sm);border:none;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--sun);color:var(--white)}
+.btn-primary:hover{background:var(--sun-dark)}
+.btn-danger{background:var(--red);color:var(--white)}
+.btn-danger:hover{background:#c04040}
+.btn-success{background:var(--green);color:var(--white)}
+.btn-success:hover{background:#249666}
+.btn-outline{background:transparent;color:var(--sun-dark);border:2px solid var(--sun)}
+.btn-outline:hover{background:var(--sun-light)}
+.btn-gray{background:#e0e0e0;color:#555}
+.btn-gray:hover{background:#ccc}
+.btn-purple{background:var(--purple);color:var(--white)}
+.btn-purple:hover{background:#6448c0}
+.btn-sm{padding:7px 14px;font-size:.85rem}
+.btn-lg{padding:15px 30px;font-size:1.1rem}
+.btn-block{width:100%;justify-content:center}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* バッジ */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.78rem;font-weight:700}
+.badge-ok{background:var(--green-light);color:var(--green)}
+.badge-warn{background:#FFF7E0;color:#B8860B}
+.badge-err{background:var(--red-light);color:var(--red)}
+.badge-gray{background:#f0f0f0;color:#888}
+.badge-purple{background:var(--purple-light);color:var(--purple)}
+
+/* トップ */
+.top-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:680px){.top-grid{grid-template-columns:1fr}}
+
+/* 患者リスト */
+.patient-list{list-style:none}
+.patient-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--sun-light);cursor:pointer;transition:background .15s;border-radius:var(--radius-sm)}
+.patient-item:hover{background:var(--sun-light)}
+.patient-num{font-size:.8rem;color:var(--text-sub);min-width:50px}
+.patient-name{font-weight:700;font-size:1rem;flex:1}
+.patient-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* 患者ヘッダー */
+.patient-header{background:linear-gradient(135deg,var(--sun) 0%,var(--sun-dark) 100%);border-radius:var(--radius);padding:24px;color:var(--white);margin-bottom:20px;box-shadow:var(--shadow)}
+.patient-header-top{display:flex;align-items:flex-start;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.patient-avatar{width:56px;height:56px;background:rgba(255,255,255,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0}
+.patient-info-main{flex:1}
+.patient-pnum{font-size:.85rem;opacity:.85;margin-bottom:2px}
+.patient-pname{font-size:1.5rem;font-weight:700}
+.patient-memo-text{font-size:.85rem;opacity:.8;margin-top:4px}
+.patient-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat-card{background:rgba(255,255,255,.2);border-radius:var(--radius-sm);padding:12px 16px}
+.stat-label{font-size:.78rem;opacity:.85;margin-bottom:4px}
+.stat-value{font-size:1.3rem;font-weight:700}
+.stat-value.warn{color:#FFE082}
+.stat-value.danger{color:#FF8A80}
+
+/* タブ */
+.tabs{display:flex;gap:4px;background:var(--white);padding:6px;border-radius:var(--radius);box-shadow:var(--shadow-card);margin-bottom:20px;overflow-x:auto}
+.tab-btn{flex:1;min-width:90px;padding:10px 12px;border-radius:var(--radius-sm);border:none;background:transparent;font-size:.85rem;font-weight:600;color:var(--text-sub);cursor:pointer;transition:all .2s;white-space:nowrap}
+.tab-btn:hover{background:var(--sun-light);color:var(--sun-dark)}
+.tab-btn.active{background:var(--sun);color:var(--white)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* プリペイド */
+.prepaid-balance-big{text-align:center;padding:20px;background:var(--sun-light);border-radius:var(--radius);margin-bottom:20px}
+.prepaid-balance-big .amount{font-size:2.8rem;font-weight:700;color:var(--sun-deep);line-height:1.1}
+.prepaid-balance-big .unit{font-size:1rem;font-weight:400;color:var(--sun-dark)}
+.prepaid-balance-big .expiry{font-size:.9rem;color:var(--text-sub);margin-top:8px}
+.prepaid-balance-big .expiry.warn{color:var(--red);font-weight:600}
+.prepaid-actions{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+@media(max-width:580px){.prepaid-actions{grid-template-columns:1fr}}
+.action-panel{background:var(--sun-bg);border:2px solid var(--border);border-radius:var(--radius);padding:20px}
+.action-panel-title{font-size:1rem;font-weight:700;color:var(--sun-dark);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.calc-preview{background:var(--white);border-radius:var(--radius-sm);padding:12px 14px;margin:10px 0;font-size:.88rem}
+.calc-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--border)}
+.calc-row:last-child{border:none;font-weight:700;font-size:1rem}
+.calc-row.total{color:var(--sun-deep)}
+
+/* テーブル */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th{background:var(--sun-light);color:var(--sun-deep);font-weight:700;padding:10px 12px;text-align:left;white-space:nowrap;border-bottom:2px solid var(--sun)}
+td{padding:10px 12px;border-bottom:1px solid var(--sun-light);color:var(--text);vertical-align:middle}
+tr:hover td{background:var(--sun-bg)}
+tr.canceled td{opacity:.5;text-decoration:line-through}
+.type-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.78rem;font-weight:700}
+.type-入金{background:var(--green-light);color:var(--green)}
+.type-利用{background:var(--blue-light);color:var(--blue)}
+.type-取消{background:var(--red-light);color:var(--red)}
+.type-復活{background:#F3E5FF;color:#7B2FBE}
+.type-期限切れ{background:#f0f0f0;color:#888}
+
+/* アラート */
+.alert-filters{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.alert-filter-btn{padding:6px 14px;border-radius:20px;border:2px solid var(--border);background:var(--white);color:var(--text-sub);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s}
+.alert-filter-btn.active{border-color:var(--sun);background:var(--sun);color:var(--white)}
+.alert-list{list-style:none}
+.alert-item{display:grid;grid-template-columns:90px 1fr auto auto;gap:12px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--sun-light);border-radius:var(--radius-sm);transition:background .15s}
+.alert-item:hover{background:var(--sun-light)}
+.alert-item.expired{background:var(--red-light)}
+.alert-expiry{font-size:.88rem;font-weight:700;text-align:center}
+.alert-expiry .days{font-size:.75rem;margin-top:2px}
+.alert-expiry.near{color:var(--red)}
+.alert-expiry.expired{color:var(--red)}
+.alert-info .alert-name{font-weight:700;font-size:1rem}
+.alert-info .alert-detail{font-size:.82rem;color:var(--text-sub);margin-top:2px}
+.alert-memo-input{font-size:.82rem;padding:4px 8px;border:1px solid var(--border);border-radius:4px;width:120px}
+@media(max-width:560px){.alert-item{grid-template-columns:1fr;gap:6px}}
+
+/* 確認済みタブ */
+.checked-list{list-style:none}
+.checked-item{display:flex;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--sun-light);opacity:.7;font-size:.9rem}
+.checked-date{font-size:.78rem;color:var(--text-sub);min-width:80px}
+
+/* ログ */
+.log-list{list-style:none}
+.log-item{display:grid;grid-template-columns:140px 80px 1fr;gap:8px;padding:10px 12px;border-bottom:1px solid var(--sun-light);font-size:.85rem;align-items:start}
+.log-time{color:var(--text-sub);font-size:.8rem}
+.log-action{font-weight:700}
+.log-action.addPrepaidPayment{color:var(--green)}
+.log-action.addPrepaidUsage{color:var(--blue)}
+.log-action.cancelPrepaid{color:var(--red)}
+.log-action.revivePrepaid{color:var(--purple)}
+.log-action.registerPatient{color:var(--sun-dark)}
+.log-action.checkAlert{color:#888}
+.log-detail{color:var(--text-sub);font-size:.8rem;word-break:break-all}
+
+/* モーダル */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.hidden{display:none}
+.modal{background:var(--white);border-radius:var(--radius);padding:28px;max-width:480px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.2);animation:slideUp .2s ease}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-title{font-size:1.1rem;font-weight:700;margin-bottom:18px;color:var(--sun-deep)}
+.modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+
+/* トースト */
+.toast-container{position:fixed;bottom:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--text);color:var(--white);padding:12px 20px;border-radius:var(--radius-sm);font-size:.9rem;box-shadow:0 4px 16px rgba(0,0,0,.2);animation:toastIn .3s ease;max-width:320px}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+@keyframes toastIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ローディング・空 */
+.loading{display:flex;align-items:center;gap:10px;color:var(--text-sub);padding:20px;justify-content:center}
+.spinner{width:22px;height:22px;border:3px solid var(--sun-light);border-top-color:var(--sun);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:30px;color:var(--text-sub);font-size:.9rem}
+
+/* 印刷 */
+@media print{
+  * { -webkit-print-color-adjust: exact; }
+  body > * { display: none !important; }
+  .header { display: none !important; }
+  .toast-container { display: none !important; }
+  .modal-overlay { display: none !important; }
+
+  /* 集計印刷 */
+  body.printing-summary > .main { display: block !important; }
+  body.printing-summary #page-summary { display: block !important; }
+  body.printing-summary #page-summary .print-hide { display: none !important; }
+  body.printing-summary .card { box-shadow: none !important; border: 1px solid #ccc; margin-bottom: 10px; break-inside: avoid; }
+  body.printing-summary .card-title { font-size: 12px; margin-bottom: 8px; padding-bottom: 6px; }
+  body.printing-summary table { font-size: 10px; }
+  body.printing-summary th { background: #f0f0f0 !important; color: black !important; padding: 4px 6px; }
+  body.printing-summary td { padding: 4px 6px; }
+
+  /* 患者印刷 */
+  body.printing-patient > .main { display: block !important; }
+  body.printing-patient #page-patient { display: block !important; }
+  body.printing-patient .tab-content { display: block !important; }
+  body.printing-patient .patient-header { background: white !important; color: black !important; border: 2px solid #ccc; }
+  body.printing-patient table { font-size: 11px; }
+  body.printing-patient .tabs { display: none !important; }
+  body.printing-patient .prepaid-actions { display: none !important; }
+  body.printing-patient .btn { display: none !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo" onclick="showPage('top')">
+      <span class="logo-icon">☀️</span><span>たいよう管理</span>
+    </div>
+    <nav class="header-nav">
+      <button class="nav-btn active" onclick="showPage('top')" id="nav-top">🏠 トップ</button>
+      <button class="nav-btn" onclick="showPage('alerts')" id="nav-alerts">⚠️ アラート</button>
+      <button class="nav-btn" onclick="showPage('summary')" id="nav-summary">📊 集計</button>
+      <button class="nav-btn" onclick="showPage('logs')" id="nav-logs">📋 操作ログ</button>
+      <button class="nav-btn" onclick="showPage('settings')" id="nav-settings">⚙️ 設定</button>
+    </nav>
+    <div class="gas-status" id="gas-status">未接続</div>
+  </div>
+</header>
+
+<div class="main">
+
+<!-- トップ -->
+<div class="page active" id="page-top">
+  <div class="setup-banner" id="setup-banner">
+    <p>📋 まずGoogle Apps ScriptのデプロイURLを設定してください</p>
+    <input type="text" id="gas-url-input" placeholder="https://script.google.com/macros/s/...">
+    <button class="btn-save-url" onclick="saveGasUrl()">💾 保存</button>
+  </div>
+
+  <div class="top-grid">
+    <div class="card">
+      <div class="card-title">👤 新規患者登録</div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label>患者番号 *</label>
+        <input type="text" id="reg-number" placeholder="例: 1234" inputmode="numeric">
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label>患者名 *</label>
+        <input type="text" id="reg-name" placeholder="例: 山田 太郎">
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label>メモ（任意）</label>
+        <input type="text" id="reg-memo" placeholder="備考など">
+      </div>
+      <button class="btn btn-primary btn-block" onclick="registerPatient()">✅ 登録して患者画面へ</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔍 患者検索</div>
+      <div class="form-row">
+        <div class="form-group wide">
+          <label>患者番号 または 患者名</label>
+          <input type="text" id="search-keyword" placeholder="番号・名前を入力" onkeydown="if(event.key==='Enter')searchPatients()">
+        </div>
+      </div>
+      <button class="btn btn-outline btn-block" onclick="searchPatients()" style="margin-bottom:16px">🔍 検索</button>
+      <div id="search-results"></div>
+    </div>
+  </div>
+
+  <!-- トップのアラートサマリー -->
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between">
+      <span>⚠️ 有効期限アラート</span>
+      <button class="btn btn-sm btn-outline" onclick="showPage('alerts')">すべて見る →</button>
+    </div>
+    <div id="top-alert-summary"></div>
+  </div>
+</div>
+
+<!-- アラートページ -->
+<div class="page" id="page-alerts">
+  <div class="card">
+    <div class="card-title">⚠️ 有効期限アラート管理</div>
+
+    <div class="alert-filters">
+      <span style="font-size:.85rem;color:var(--text-sub)">表示範囲：</span>
+      <button class="alert-filter-btn active" onclick="setAlertDays(this,7)">1週間以内</button>
+      <button class="alert-filter-btn" onclick="setAlertDays(this,14)">2週間以内</button>
+      <button class="alert-filter-btn" onclick="setAlertDays(this,30)">1ヶ月以内</button>
+      <button class="alert-filter-btn" onclick="setAlertDays(this,0)">期限切れ含む全件</button>
+      <button class="btn btn-sm btn-gray" onclick="loadAlerts()" style="margin-left:auto">🔄 更新</button>
+    </div>
+
+    <!-- 未確認タブ -->
+    <div class="tabs" style="margin-bottom:16px">
+      <button class="tab-btn active" onclick="switchAlertTab('unchecked',this)">未確認</button>
+      <button class="tab-btn" onclick="switchAlertTab('checked',this)">確認済み履歴</button>
+    </div>
+
+    <div id="alert-unchecked-area">
+      <div class="loading"><div class="spinner"></div>読み込み中...</div>
+    </div>
+    <div id="alert-checked-area" style="display:none">
+      <div class="loading"><div class="spinner"></div>読み込み中...</div>
+    </div>
+  </div>
+</div>
+
+<!-- 操作ログページ -->
+<div class="page" id="page-logs">
+  <div class="card">
+    <div class="card-title">📋 操作ログ</div>
+    <div class="form-row" style="margin-bottom:16px">
+      <div class="form-group">
+        <label>患者番号で絞り込み（空白で全件）</label>
+        <input type="text" id="log-patient-filter" placeholder="患者番号">
+      </div>
+      <div style="display:flex;align-items:flex-end">
+        <button class="btn btn-outline" onclick="loadLogs()">🔍 検索</button>
+      </div>
+    </div>
+    <div id="log-area">
+      <div class="loading"><div class="spinner"></div>読み込み中...</div>
+    </div>
+  </div>
+</div>
+
+<!-- 患者画面 -->
+<div class="page" id="page-patient">
+  <button class="btn btn-gray btn-sm" onclick="showPage('top')" style="margin-bottom:16px">← トップへ戻る</button>
+
+  <div class="patient-header" id="patient-header">
+    <div class="patient-header-top">
+      <div class="patient-avatar">🙂</div>
+      <div class="patient-info-main">
+        <div class="patient-pnum" id="ph-number">---</div>
+        <div class="patient-pname" id="ph-name">---</div>
+        <div class="patient-memo-text" id="ph-memo"></div>
+      </div>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,.25);color:#fff" onclick="openMemoModal()">✏️ メモ編集</button>
+    </div>
+    <div class="patient-stats">
+      <div class="stat-card">
+        <div class="stat-label">💰 プリペイド残高</div>
+        <div class="stat-value" id="ph-balance">0<span style="font-size:.9rem">pt</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">📅 有効期限</div>
+        <div class="stat-value" id="ph-expiry" style="font-size:1.1rem">---</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">🔄 サブスク</div>
+        <div class="stat-value" id="ph-subscription" style="font-size:.9rem">---</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">🎫 回数券</div>
+        <div class="stat-value" id="ph-ticket" style="font-size:.9rem">---</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('prepaid',this)">💰 プリペイド</button>
+    <button class="tab-btn" onclick="switchTab('subscriptions',this)">🔄 サブスク</button>
+    <button class="tab-btn" onclick="switchTab('tickets',this)">🎫 回数券</button>
+    <button class="tab-btn" onclick="switchTab('history',this)">📋 全履歴</button>
+    <button class="tab-btn" onclick="printPatient()">🖨️ 印刷</button>
+  </div>
+
+  <!-- プリペイドタブ -->
+  <div class="tab-content active" id="tab-prepaid">
+    <div class="prepaid-balance-big">
+      <div class="amount" id="prepaid-balance-disp">0<span class="unit"> pt</span></div>
+      <div class="expiry" id="prepaid-expiry-disp">有効期限: ---</div>
+    </div>
+
+    <div class="prepaid-actions">
+      <div class="action-panel">
+        <div class="action-panel-title">💳 入金</div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>入金額（円）</label>
+          <input type="number" id="pay-amount" placeholder="10000" step="1000" min="0" oninput="calcPayPreview()">
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>日付</label>
+          <input type="date" id="pay-date">
+        </div>
+        <div class="calc-preview" id="pay-preview" style="display:none">
+          <div class="calc-row"><span>入金額</span><span id="pp-amount">0</span></div>
+          <div class="calc-row"><span>付与ポイント</span><span id="pp-bonus" style="color:var(--green)">+0pt</span></div>
+          <div class="calc-row"><span>繰越残高</span><span id="pp-prev">0pt</span></div>
+          <div class="calc-row total"><span>入金後残高</span><span id="pp-after">0pt</span></div>
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>支払い方法</label>
+          <select id="pay-method"><option value="">-- 選択 --</option></select>
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>メモ</label>
+          <input type="text" id="pay-memo" placeholder="備考">
+        </div>
+        <button class="btn btn-primary btn-block" onclick="confirmPayment()">💳 入金登録</button>
+      </div>
+
+      <div class="action-panel">
+        <div class="action-panel-title">🏥 利用</div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>利用金額（pt）</label>
+          <input type="number" id="use-amount" placeholder="0" min="0" oninput="calcUsePreview()">
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>日付</label>
+          <input type="date" id="use-date">
+        </div>
+        <div class="calc-preview" id="use-preview" style="display:none">
+          <div class="calc-row"><span>現在残高</span><span id="up-prev">0pt</span></div>
+          <div class="calc-row"><span>利用金額</span><span id="up-use" style="color:var(--red)">-0pt</span></div>
+          <div class="calc-row total"><span>利用後残高</span><span id="up-after">0pt</span></div>
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>メモ</label>
+          <input type="text" id="use-memo" placeholder="備考">
+        </div>
+        <button class="btn btn-success btn-block" onclick="confirmUsage()">✅ 利用登録</button>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+      <button class="btn btn-outline btn-sm" onclick="openReviveModal()">🔄 有効期限復活処理</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 プリペイド履歴</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>日付</th><th>区分</th><th>入金額</th><th>付与pt</th><th>利用pt</th><th>残高</th><th>有効期限</th><th>支払方法</th><th>メモ</th><th>操作</th></tr></thead>
+          <tbody id="prepaid-history-body"><tr><td colspan="9" class="empty">履歴がありません</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- サブスクタブ -->
+  <div class="tab-content" id="tab-subscriptions">
+    <!-- 契約中サブスク一覧 -->
+    <div id="sub-list-area"></div>
+
+    <!-- 新規契約 -->
+    <div class="card">
+      <div class="card-title">➕ 新規サブスク契約</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>商品を選択</label>
+          <select id="sub-product-select"><option value="">-- 商品を選択 --</option></select>
+        </div>
+        <div class="form-group">
+          <label>開始日</label>
+          <input type="date" id="sub-start-date">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label>支払い方法</label>
+        <select id="sub-new-method"><option value="">-- 選択 --</option></select>
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label>メモ</label>
+        <input type="text" id="sub-new-memo" placeholder="備考">
+      </div>
+      <div id="sub-product-preview" style="display:none;margin-bottom:12px"></div>
+      <button class="btn btn-primary" onclick="confirmAddSubscription()">✅ 契約開始</button>
+    </div>
+
+    <!-- サブスク全履歴 -->
+    <div class="card">
+      <div class="card-title">📋 サブスク履歴</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>日付</th><th>商品名</th><th>区分</th><th>支払</th><th>支払方法</th><th>延長日数</th><th>更新前期限</th><th>更新後期限</th><th>メモ</th></tr></thead>
+          <tbody id="sub-history-body"><tr><td colspan="8" class="empty">履歴がありません</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="tab-content" id="tab-tickets">
+    <!-- 保有回数券一覧 -->
+    <div id="ticket-list-area"></div>
+
+    <!-- 新規購入 -->
+    <div class="card">
+      <div class="card-title">➕ 回数券購入</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>商品を選択</label>
+          <select id="ticket-product-select"><option value="">-- 商品を選択 --</option></select>
+        </div>
+        <div class="form-group">
+          <label>購入日</label>
+          <input type="date" id="ticket-purchase-date">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label>支払い方法</label>
+        <select id="ticket-pay-method"><option value="">-- 選択 --</option></select>
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label>メモ</label>
+        <input type="text" id="ticket-new-memo" placeholder="備考">
+      </div>
+      <div id="ticket-product-preview" style="display:none;margin-bottom:12px"></div>
+      <button class="btn btn-primary" onclick="confirmPurchaseTicket()">🎫 購入登録</button>
+    </div>
+
+    <!-- 回数券履歴 -->
+    <div class="card">
+      <div class="card-title">📋 回数券履歴</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>日付</th><th>商品名</th><th>区分</th><th>変動</th><th>残回数</th><th>有効期限</th><th>支払方法</th><th>メモ</th><th>操作</th></tr></thead>
+          <tbody id="ticket-history-body"><tr><td colspan="8" class="empty">履歴がありません</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="tab-content" id="tab-history">
+    <div class="card">
+      <div class="card-title">📋 全履歴</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>日付</th><th>種別</th><th>区分</th><th>金額/pt</th><th>残高/残回数</th><th>有効期限</th><th>メモ</th></tr></thead>
+          <tbody id="all-history-body"><tr><td colspan="7" class="empty">履歴がありません</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 設定 -->
+
+<!-- 集計ページ -->
+<div class="page" id="page-summary">
+  <div class="card">
+    <div class="card-title">📊 集計・レポート</div>
+
+    <!-- 検索条件 -->
+    <div class="print-hide" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px">
+      <div class="form-group">
+        <label>開始日</label>
+        <input type="date" id="sum-start">
+      </div>
+      <div class="form-group">
+        <label>終了日</label>
+        <input type="date" id="sum-end">
+      </div>
+      <div class="form-group">
+        <label>患者番号（空白=全員）</label>
+        <input type="text" id="sum-patient" placeholder="例: 3004">
+      </div>
+      <div class="form-group">
+        <label>種別</label>
+        <select id="sum-type">
+          <option value="all">すべて</option>
+          <option value="prepaid">プリペイド</option>
+          <option value="subscription">サブスク</option>
+          <option value="ticket">回数券</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-primary print-hide" onclick="loadSummary()">🔍 集計する</button>
+      <button class="btn btn-outline print-hide" onclick="exportCSV()">📥 CSV出力</button>
+      <button class="btn btn-gray print-hide" onclick="printSummary()">🖨️ 印刷</button>
+    </div>
+  </div>
+
+  <div id="summary-area"></div>
+</div>
+
+<div class="page" id="page-settings">
+  <div class="card">
+    <div class="card-title">⚙️ システム設定</div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>Google Apps Script デプロイURL</label>
+      <input type="text" id="settings-gas-url" placeholder="https://script.google.com/macros/s/...">
+    </div>
+    <button class="btn btn-primary" onclick="saveGasUrlFromSettings()">💾 保存</button>
+    <div style="margin-top:16px">
+      <button class="btn btn-outline btn-sm" onclick="testConnection()">🔌 接続テスト</button>
+    </div>
+  </div>
+  <!-- 支払い方法マスター -->
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between">
+      <span>💳 支払い方法マスター</span>
+      <button class="btn btn-sm btn-outline" onclick="openPaymentMethodModal(null)">➕ 追加</button>
+    </div>
+    <div id="payment-methods-area"><div class="loading"><div class="spinner"></div>読み込み中...</div></div>
+  </div>
+
+  <!-- サブスク商品マスター -->
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between">
+      <span>🔄 サブスク商品マスター</span>
+      <button class="btn btn-sm btn-outline" onclick="openProductModal(null)">➕ 商品追加</button>
+    </div>
+    <div id="sub-products-area"><div class="loading"><div class="spinner"></div>読み込み中...</div></div>
+  </div>
+
+  <!-- 回数券商品マスター -->
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between">
+      <span>🎫 回数券商品マスター</span>
+      <button class="btn btn-sm btn-outline" onclick="openTicketProductModal(null)">➕ 商品追加</button>
+    </div>
+    <div id="ticket-products-area"><div class="loading"><div class="spinner"></div>読み込み中...</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📖 セットアップ手順</div>
+    <ol style="line-height:2.2;padding-left:20px;font-size:.95rem">
+      <li>スプレッドシートの「拡張機能 → Apps Script」を開く</li>
+      <li><code>gas_code.gs</code> の内容を貼り付け</li>
+      <li><code>setupAllSheets()</code> を一度実行してシートを初期化</li>
+      <li>GASをWebアプリとしてデプロイ（全員アクセス可）</li>
+      <li>デプロイURLを上の欄に入力して保存</li>
+    </ol>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- モーダル類 -->
+<div class="modal-overlay hidden" id="modal-confirm">
+  <div class="modal">
+    <div class="modal-title" id="modal-confirm-title">確認</div>
+    <div id="modal-confirm-body"></div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="closeModal('modal-confirm')">キャンセル</button>
+      <button class="btn btn-primary" id="modal-confirm-ok">実行</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modal-revive">
+  <div class="modal">
+    <div class="modal-title">🔄 有効期限復活処理</div>
+    <p style="font-size:.9rem;color:var(--text-sub);margin-bottom:14px">期限切れのプリペイドカードを復活させます。本日から1年に更新されます。</p>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>復活理由 *</label>
+      <input type="text" id="revive-reason" placeholder="例: 追加購入のため">
+    </div>
+    <div class="form-group">
+      <label>メモ</label>
+      <input type="text" id="revive-memo" placeholder="備考">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="closeModal('modal-revive')">キャンセル</button>
+      <button class="btn btn-primary" onclick="executeRevive()">🔄 復活実行</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modal-memo">
+  <div class="modal">
+    <div class="modal-title">✏️ メモ編集</div>
+    <div class="form-group">
+      <label>メモ</label>
+      <textarea id="edit-memo" rows="4" placeholder="患者メモ"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="closeModal('modal-memo')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveMemo()">💾 保存</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- サブスク：継続確認モーダル -->
+<div class="modal-overlay hidden" id="modal-sub-renew">
+  <div class="modal">
+    <div class="modal-title">🔄 サブスク継続</div>
+    <div id="sub-renew-info" style="background:var(--sun-light);padding:14px;border-radius:8px;margin-bottom:14px;font-size:.95rem"></div>
+    <div class="form-group" style="margin-bottom:10px">
+      <label>支払い方法</label>
+      <select id="sub-renew-method"><option value="">-- 選択 --</option></select>
+    </div>
+    <div class="form-group">
+      <label>メモ（任意）</label>
+      <input type="text" id="sub-renew-memo" placeholder="例: 5月分支払い済み">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="closeModal('modal-sub-renew')">キャンセル</button>
+      <button class="btn btn-primary" onclick="executeRenew()">🔄 継続する</button>
+    </div>
+  </div>
+</div>
+
+<!-- サブスク：延長モーダル -->
+<div class="modal-overlay hidden" id="modal-sub-extend">
+  <div class="modal">
+    <div class="modal-title">📅 有効期限延長</div>
+    <div id="sub-extend-info" style="background:var(--sun-light);padding:14px;border-radius:8px;margin-bottom:14px;font-size:.95rem"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>延長日数 *</label>
+        <input type="number" id="sub-extend-days" placeholder="例: 7" min="1">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>延長理由</label>
+      <input type="text" id="sub-extend-memo" placeholder="例: 都合により延長">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="closeModal('modal-sub-extend')">キャンセル</button>
+      <button class="btn btn-success" onclick="executeExtend()">📅 延長する</button>
+    </div>
+  </div>
+</div>
+
+<!-- サブスク：終了・停止確認モーダル -->
+<div class="modal-overlay hidden" id="modal-sub-end">
+  <div class="modal">
+    <div class="modal-title" id="modal-sub-end-title">サブスク操作</div>
+    <div id="sub-end-info" style="background:var(--sun-light);padding:14px;border-radius:8px;margin-bottom:14px;font-size:.95rem"></div>
+    <div class="form-group">
+      <label>理由・メモ</label>
+      <input type="text" id="sub-end-memo" placeholder="理由を入力">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="closeModal('modal-sub-end')">キャンセル</button>
+      <button class="btn btn-danger" id="sub-end-ok-btn" onclick="executeSubEnd()">実行</button>
+    </div>
+  </div>
+</div>
+
+<!-- 商品マスター編集モーダル -->
+<div class="modal-overlay hidden" id="modal-product">
+  <div class="modal">
+    <div class="modal-title" id="modal-product-title">商品登録</div>
+    <div class="form-group" style="margin-bottom:10px">
+      <label>商品名 *</label>
+      <input type="text" id="prod-name" placeholder="例: 楽トレ">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>金額（円）</label>
+        <input type="number" id="prod-price" placeholder="8800" min="0">
+      </div>
+      <div class="form-group">
+        <label>契約期間（ヶ月）</label>
+        <input type="number" id="prod-months" placeholder="1" min="0">
+      </div>
+      <div class="form-group">
+        <label>または期間（日）</label>
+        <input type="number" id="prod-days" placeholder="0" min="0">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>メモ</label>
+      <input type="text" id="prod-memo" placeholder="備考">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="closeModal('modal-product')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveProduct()">💾 保存</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- 回数券：使用確認モーダル -->
+<div class="modal-overlay hidden" id="modal-ticket-use">
+  <div class="modal">
+    <div class="modal-title">🏥 本日使用</div>
+    <div id="ticket-use-info" style="background:var(--sun-light);padding:14px;border-radius:8px;margin-bottom:14px;font-size:.95rem"></div>
+    <div class="form-group">
+      <label>日付</label>
+      <input type="date" id="ticket-use-date">
+    </div>
+    <div class="form-group" style="margin-top:10px">
+      <label>メモ（任意）</label>
+      <input type="text" id="ticket-use-memo" placeholder="備考">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="closeModal('modal-ticket-use')">キャンセル</button>
+      <button class="btn btn-success" onclick="executeUseTicket()">✅ 使用する</button>
+    </div>
+  </div>
+</div>
+
+<!-- 回数券：取消確認モーダル -->
+<div class="modal-overlay hidden" id="modal-ticket-cancel">
+  <div class="modal">
+    <div class="modal-title">🚫 使用取消</div>
+    <p style="margin-bottom:12px;color:var(--red)">使用を取消して残回数を1回戻します。</p>
+    <div id="ticket-cancel-info" style="background:var(--sun-bg);padding:12px;border-radius:8px;margin-bottom:12px;font-size:.88rem"></div>
+    <div class="form-group">
+      <label>取消理由</label>
+      <input type="text" id="ticket-cancel-memo" placeholder="取消理由を入力">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="closeModal('modal-ticket-cancel')">キャンセル</button>
+      <button class="btn btn-danger" onclick="executeTicketCancel()">🚫 取消実行</button>
+    </div>
+  </div>
+</div>
+
+<!-- 回数券商品マスター編集モーダル -->
+<div class="modal-overlay hidden" id="modal-ticket-product">
+  <div class="modal">
+    <div class="modal-title" id="modal-ticket-product-title">回数券商品登録</div>
+    <div class="form-row" style="margin-bottom:10px">
+      <div class="form-group">
+        <label>カテゴリー</label>
+        <input type="text" id="tprod-category" placeholder="例: 楽トレノーマル">
+      </div>
+      <div class="form-group wide">
+        <label>商品名 *</label>
+        <input type="text" id="tprod-name" placeholder="例: 楽トレ ノーマル 10回券">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>販売価格（円）</label>
+        <input type="number" id="tprod-price" placeholder="27500" min="0">
+      </div>
+      <div class="form-group">
+        <label>回数</label>
+        <input type="number" id="tprod-count" placeholder="10" min="1">
+      </div>
+      <div class="form-group">
+        <label>有効日数</label>
+        <input type="number" id="tprod-expiry" placeholder="365" min="1">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>メモ</label>
+      <input type="text" id="tprod-memo" placeholder="備考">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="closeModal('modal-ticket-product')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveTicketProduct()">💾 保存</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- 支払い方法マスター編集モーダル -->
+<div class="modal-overlay hidden" id="modal-payment-method">
+  <div class="modal">
+    <div class="modal-title" id="modal-pm-title">支払い方法登録</div>
+    <div class="form-group" style="margin-bottom:10px">
+      <label>支払い方法名 *</label>
+      <input type="text" id="pm-name" placeholder="例: PayPay">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>表示順</label>
+        <input type="number" id="pm-sort" placeholder="1" min="1">
+      </div>
+      <div class="form-group">
+        <label>表示/非表示</label>
+        <select id="pm-active">
+          <option value="true">表示</option>
+          <option value="false">非表示</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>メモ</label>
+      <input type="text" id="pm-memo" placeholder="備考">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="closeModal('modal-payment-method')">キャンセル</button>
+      <button class="btn btn-primary" onclick="savePaymentMethod()">💾 保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modal-cancel">
+  <div class="modal">
+    <div class="modal-title">🚫 取消処理</div>
+    <p style="margin-bottom:12px;color:var(--red)">この履歴を取消します。残高が再計算されます。</p>
+    <div id="cancel-target-info" style="background:var(--sun-bg);padding:12px;border-radius:8px;margin-bottom:12px;font-size:.88rem"></div>
+    <div class="form-group">
+      <label>取消理由</label>
+      <input type="text" id="cancel-memo" placeholder="取消理由を入力">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="closeModal('modal-cancel')">キャンセル</button>
+      <button class="btn btn-danger" onclick="executeCancel()">🚫 取消実行</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// =============================================
+// アプリ状態
+// =============================================
+const APP = {
+  gasUrl: localStorage.getItem('taiyou_gas_url') || '',
+  currentPatient: null,
+  currentBalance: 0,
+  currentExpiry: '',
+  cancelTarget: null,
+  alertDays: 7,
+  subscriptionProducts: [],
+  ticketProducts: [],
+  paymentMethods: [],
+  editingProduct: null,
+  editingTicketProduct: null,
+  editingPaymentMethod: null,
+};
+
+// =============================================
+// 初期化
+// =============================================
+document.addEventListener('DOMContentLoaded', () => {
+  const t = todayStr();
+  document.getElementById('pay-date').value = t;
+  document.getElementById('use-date').value = t;
+  const subStartEl = document.getElementById('sub-start-date');
+  if (subStartEl) subStartEl.value = t;
+  const tktDateEl = document.getElementById('ticket-purchase-date');
+  if (tktDateEl) tktDateEl.value = t;
+  if (APP.gasUrl) {
+    document.getElementById('setup-banner').style.display = 'none';
+    document.getElementById('settings-gas-url').value = APP.gasUrl;
+    document.getElementById('gas-url-input').value = APP.gasUrl;
+    updateGasStatus('接続設定済','ok');
+    loadTopAlertSummary();
+    loadSubscriptionProducts();
+    loadTicketProductsList();
+    loadPaymentMethodsList();
+  }
+});
+
+// =============================================
+// ページ遷移
+// =============================================
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const nav = document.getElementById('nav-'+name);
+  if (nav) nav.classList.add('active');
+  window.scrollTo(0,0);
+  if (name === 'alerts') { loadAlerts(); loadCheckedAlerts(); }
+  if (name === 'logs') loadLogs();
+  if (name === 'settings') { loadPaymentMethodsMaster(); loadSubProductsMaster(); loadTicketProductsMaster(); }
+  if (name === 'summary') initSummaryPage();
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('#page-patient .tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (name === 'history' && APP.currentPatient) loadAllHistory();
+  if (name === 'subscriptions' && APP.currentPatient) loadSubscriptions();
+  if (name === 'tickets' && APP.currentPatient) loadTickets();
+}
+
+function switchAlertTab(name, btn) {
+  document.querySelectorAll('.tabs .tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('alert-unchecked-area').style.display = name === 'unchecked' ? 'block' : 'none';
+  document.getElementById('alert-checked-area').style.display = name === 'checked' ? 'block' : 'none';
+}
+
+// =============================================
+// GAS通信
+// =============================================
+async function callGas(action, params = {}) {
+  if (!APP.gasUrl) throw new Error('GAS URLが設定されていません');
+  const res = await fetch(APP.gasUrl, {
+    method: 'POST',
+    headers: {'Content-Type':'text/plain'},
+    body: JSON.stringify({action, ...params})
+  });
+  const data = await res.json();
+  if (!data.success) throw new Error(data.error || '不明なエラー');
+  return data;
+}
+
+function saveGasUrl() {
+  const url = document.getElementById('gas-url-input').value.trim();
+  if (!url) return showToast('URLを入力してください','error');
+  APP.gasUrl = url;
+  localStorage.setItem('taiyou_gas_url', url);
+  document.getElementById('setup-banner').style.display = 'none';
+  document.getElementById('settings-gas-url').value = url;
+  updateGasStatus('接続設定済','ok');
+  showToast('GAS URLを保存しました','success');
+  loadTopAlertSummary();
+}
+function saveGasUrlFromSettings() {
+  const url = document.getElementById('settings-gas-url').value.trim();
+  if (!url) return showToast('URLを入力してください','error');
+  APP.gasUrl = url;
+  localStorage.setItem('taiyou_gas_url', url);
+  document.getElementById('gas-url-input').value = url;
+  document.getElementById('setup-banner').style.display = 'none';
+  updateGasStatus('接続設定済','ok');
+  showToast('GAS URLを保存しました','success');
+  loadTopAlertSummary();
+}
+async function testConnection() {
+  try {
+    await callGas('searchPatients',{keyword:''});
+    updateGasStatus('✅ 接続OK','ok');
+    showToast('接続成功！','success');
+  } catch(e) {
+    updateGasStatus('❌ 接続エラー','err');
+    showToast('接続失敗: '+e.message,'error');
+  }
+}
+function updateGasStatus(text, cls) {
+  const el = document.getElementById('gas-status');
+  el.textContent = text;
+  el.className = 'gas-status '+(cls||'');
+}
+
+// =============================================
+// 患者登録・検索
+// =============================================
+async function registerPatient() {
+  const number = document.getElementById('reg-number').value.trim();
+  const name = document.getElementById('reg-name').value.trim();
+  const memo = document.getElementById('reg-memo').value.trim();
+  if (!number) return showToast('患者番号を入力してください','error');
+  if (!name) return showToast('患者名を入力してください','error');
+  try {
+    const res = await callGas('registerPatient',{patient_number:number,patient_name:name,memo});
+    showToast('登録しました: '+name,'success');
+    document.getElementById('reg-number').value='';
+    document.getElementById('reg-name').value='';
+    document.getElementById('reg-memo').value='';
+    openPatientPage(res.patient);
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+async function searchPatients() {
+  const keyword = document.getElementById('search-keyword').value.trim();
+  const area = document.getElementById('search-results');
+  area.innerHTML = '<div class="loading"><div class="spinner"></div>検索中...</div>';
+  try {
+    const res = await callGas('searchPatients',{keyword});
+    const patients = res.patients;
+    if (!patients.length) { area.innerHTML='<div class="empty">該当する患者が見つかりませんでした</div>'; return; }
+    const ul = document.createElement('ul');
+    ul.className = 'patient-list';
+    patients.forEach(p => {
+      const li = document.createElement('li');
+      li.className = 'patient-item';
+      const warn = isExpirySoon(formatDate(p.prepaid_expiry));
+      const expired = isExpired(formatDate(p.prepaid_expiry));
+      li.innerHTML = `
+        <div class="patient-num">No.${p.patient_number}</div>
+        <div class="patient-name">${esc(p.patient_name)}</div>
+        <div class="patient-meta">
+          <span class="badge ${p.prepaid_balance>0?'badge-ok':'badge-gray'}">💰 ${(p.prepaid_balance||0).toLocaleString()}pt</span>
+          ${p.prepaid_expiry?`<span class="badge ${expired?'badge-err':warn?'badge-warn':'badge-gray'}">📅 ${formatDate(p.prepaid_expiry)}</span>`:''}
+        </div>`;
+      li.onclick = () => loadAndOpenPatient(p.patient_number);
+      ul.appendChild(li);
+    });
+    area.innerHTML=''; area.appendChild(ul);
+  } catch(e) { area.innerHTML=`<div class="empty" style="color:var(--red)">❌ ${esc(e.message)}</div>`; }
+}
+
+async function loadAndOpenPatient(pnum) {
+  try {
+    const res = await callGas('getPatient',{patient_number:pnum});
+    openPatientPage(res.patient);
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+// =============================================
+// 患者画面
+// =============================================
+function openPatientPage(patient) {
+  APP.currentPatient = patient;
+  APP.currentBalance = patient.prepaid_balance || 0;
+  APP.currentExpiry = formatDate(patient.prepaid_expiry || '');
+  document.getElementById('ph-number').textContent = 'No.'+patient.patient_number;
+  document.getElementById('ph-name').textContent = patient.patient_name;
+  document.getElementById('ph-memo').textContent = patient.memo || '';
+  document.getElementById('ph-subscription').textContent = '読込中...';
+  document.getElementById('ph-ticket').textContent = '読込中...';
+  updateBalanceDisplay();
+  showPage('patient');
+  // タブをプリペイドに戻す
+  document.querySelectorAll('#page-patient .tab-btn').forEach((b,i) => b.classList.toggle('active',i===0));
+  document.querySelectorAll('.tab-content').forEach((c,i) => c.classList.toggle('active',i===0));
+  loadPrepaidHistory();
+  loadPatientHeaderStats();
+}
+
+async function loadPatientHeaderStats() {
+  // サブスク情報
+  try {
+    const subRes = await callGas('getSubscriptions', {patient_number: APP.currentPatient.patient_number});
+    const activeSubs = subRes.subscriptions.filter(s => s.status === '契約中');
+    const el = document.getElementById('ph-subscription');
+    if (!activeSubs.length) {
+      el.textContent = 'なし';
+      el.style.color = 'rgba(255,255,255,0.6)';
+    } else {
+      el.innerHTML = activeSubs.map(s =>
+        `<div style="font-size:.82rem;font-weight:700">${esc(s.product_name)}</div>
+         <div style="font-size:.72rem;opacity:.8">〜${formatDate(s.expiry_date)}</div>`
+      ).join('');
+    }
+  } catch(e) {
+    document.getElementById('ph-subscription').textContent = '-';
+  }
+
+  // 回数券情報
+  try {
+    const tktRes = await callGas('getTickets', {patient_number: APP.currentPatient.patient_number});
+    const activeTickets = tktRes.tickets.filter(t =>
+      Number(t.remaining_count) > 0 && t.status === '有効'
+    );
+    const el = document.getElementById('ph-ticket');
+    if (!activeTickets.length) {
+      el.textContent = 'なし';
+      el.style.color = 'rgba(255,255,255,0.6)';
+    } else {
+      el.innerHTML = activeTickets.map(t =>
+        `<div style="font-size:.82rem;font-weight:700">${esc(t.product_name)}</div>
+         <div style="font-size:.72rem;opacity:.8">残${t.remaining_count}回</div>`
+      ).join('');
+    }
+  } catch(e) {
+    document.getElementById('ph-ticket').textContent = '-';
+  }
+}
+
+function updateBalanceDisplay() {
+  const bal = APP.currentBalance, exp = formatDate(APP.currentExpiry);
+  const warn = isExpirySoon(exp), expired = isExpired(exp);
+  document.getElementById('ph-balance').innerHTML = `${bal.toLocaleString()}<span style="font-size:.9rem">pt</span>`;
+  const expEl = document.getElementById('ph-expiry');
+  expEl.textContent = exp || '---';
+  expEl.className = 'stat-value'+(expired?' danger':warn?' warn':'');
+  document.getElementById('prepaid-balance-disp').innerHTML = `${bal.toLocaleString()}<span class="unit"> pt</span>`;
+  const expDisp = document.getElementById('prepaid-expiry-disp');
+  expDisp.textContent = exp ? `有効期限: ${exp}` : '有効期限: 未設定';
+  expDisp.className = 'expiry'+(expired||warn?' warn':'');
+}
+
+// =============================================
+// プリペイド計算
+// =============================================
+function calcBonusPoints(amount) {
+  // 入金額＋ボーナスの合計pt
+  const table=[{limit:100000,pts:113000},{limit:50000,pts:56000},{limit:30000,pts:33000},{limit:20000,pts:21800},{limit:10000,pts:10800}];
+  let remaining=Math.floor(amount),totalPts=0;
+  while(remaining>=10000){
+    const tier=table.find(t=>remaining>=t.limit);
+    if(tier){const times=Math.floor(remaining/tier.limit);totalPts+=times*tier.pts;remaining-=times*tier.limit;}
+    else{totalPts+=remaining;remaining=0;}
+  }
+  return totalPts+remaining;
+}
+function calcBonusOnly(amount) {
+  // ボーナス分のみ
+  return calcBonusPoints(amount) - Math.floor(amount);
+}
+function calcPayPreview(){
+  const amount=parseInt(document.getElementById('pay-amount').value)||0;
+  const preview=document.getElementById('pay-preview');
+  if(amount<=0){preview.style.display='none';return;}
+  const totalPts=calcBonusPoints(amount),bonusOnly=calcBonusOnly(amount),after=APP.currentBalance+totalPts;
+  document.getElementById('pp-amount').textContent=amount.toLocaleString()+'円';
+  document.getElementById('pp-bonus').textContent='+'+bonusOnly.toLocaleString()+'pt（合計'+totalPts.toLocaleString()+'pt）';
+  document.getElementById('pp-prev').textContent=APP.currentBalance.toLocaleString()+'pt';
+  document.getElementById('pp-after').textContent=after.toLocaleString()+'pt';
+  preview.style.display='block';
+}
+function calcUsePreview(){
+  const amount=parseInt(document.getElementById('use-amount').value)||0;
+  const preview=document.getElementById('use-preview');
+  if(amount<=0){preview.style.display='none';return;}
+  const after=APP.currentBalance-amount;
+  document.getElementById('up-prev').textContent=APP.currentBalance.toLocaleString()+'pt';
+  document.getElementById('up-use').textContent='-'+amount.toLocaleString()+'pt';
+  document.getElementById('up-after').textContent=after.toLocaleString()+'pt';
+  document.getElementById('up-after').style.color=after<0?'var(--red)':'var(--sun-deep)';
+  preview.style.display='block';
+}
+
+// =============================================
+// 入金・利用・復活・取消
+// =============================================
+function confirmPayment(){
+  const amount=parseInt(document.getElementById('pay-amount').value)||0;
+  if(amount<=0) return showToast('入金額を入力してください','error');
+  const totalPts=calcBonusPoints(amount),bonusOnly=calcBonusOnly(amount),after=APP.currentBalance+totalPts;
+  const payMethodVal = document.getElementById('pay-method').value;
+  showConfirmModal('💳 入金登録の確認',`<div class="calc-preview">
+    <div class="calc-row"><span>患者</span><span>${esc(APP.currentPatient.patient_name)}</span></div>
+    <div class="calc-row"><span>入金額</span><span>${amount.toLocaleString()}円</span></div>
+    <div class="calc-row"><span>付与ポイント（ボーナス）</span><span style="color:var(--green)">+${bonusOnly.toLocaleString()}pt</span></div>
+    <div class="calc-row"><span>合計付与</span><span>${totalPts.toLocaleString()}pt</span></div>
+    <div class="calc-row"><span>支払い方法</span><span>${payMethodVal||'未選択'}</span></div>
+    <div class="calc-row total"><span>入金後残高</span><span>${after.toLocaleString()}pt</span></div>
+  </div>`,executePayment);
+}
+async function executePayment(){
+  closeModal('modal-confirm');
+  const amount=parseInt(document.getElementById('pay-amount').value)||0;
+  const date=document.getElementById('pay-date').value;
+  const memo=document.getElementById('pay-memo').value;
+  try{
+    const method=document.getElementById('pay-method').value;
+    const res=await callGas('addPrepaidPayment',{patient_number:APP.currentPatient.patient_number,payment_amount:amount,date,memo,payment_method:method});
+    APP.currentBalance=res.balance_after; APP.currentExpiry=res.expiry_date;
+    updateBalanceDisplay();
+    document.getElementById('pay-amount').value='';
+    document.getElementById('pay-memo').value='';
+    document.getElementById('pay-preview').style.display='none';
+    showToast(`入金完了！残高: ${res.balance_after.toLocaleString()}pt`,'success');
+    loadPrepaidHistory();
+  }catch(e){showToast(e.message,'error');}
+}
+
+function confirmUsage(){
+  const amount=parseInt(document.getElementById('use-amount').value)||0;
+  if(amount<=0) return showToast('利用金額を入力してください','error');
+  if(amount>APP.currentBalance) return showToast(`残高不足です（残高: ${APP.currentBalance.toLocaleString()}pt）`,'error');
+  const after=APP.currentBalance-amount;
+  showConfirmModal('🏥 利用登録の確認',`<div class="calc-preview">
+    <div class="calc-row"><span>患者</span><span>${esc(APP.currentPatient.patient_name)}</span></div>
+    <div class="calc-row"><span>現在残高</span><span>${APP.currentBalance.toLocaleString()}pt</span></div>
+    <div class="calc-row"><span>利用金額</span><span style="color:var(--red)">-${amount.toLocaleString()}pt</span></div>
+    <div class="calc-row total"><span>利用後残高</span><span>${after.toLocaleString()}pt</span></div>
+  </div>`,executeUsage);
+}
+async function executeUsage(){
+  closeModal('modal-confirm');
+  const amount=parseInt(document.getElementById('use-amount').value)||0;
+  const date=document.getElementById('use-date').value;
+  const memo=document.getElementById('use-memo').value;
+  try{
+    const res=await callGas('addPrepaidUsage',{patient_number:APP.currentPatient.patient_number,used_points:amount,date,memo,payment_method:'プリペイドカード'});
+    APP.currentBalance=res.balance_after; APP.currentExpiry=res.expiry_date;
+    updateBalanceDisplay();
+    document.getElementById('use-amount').value='';
+    document.getElementById('use-memo').value='';
+    document.getElementById('use-preview').style.display='none';
+    showToast(`利用完了！残高: ${res.balance_after.toLocaleString()}pt`,'success');
+    loadPrepaidHistory();
+  }catch(e){showToast(e.message,'error');}
+}
+
+function openReviveModal(){
+  document.getElementById('revive-reason').value='';
+  document.getElementById('revive-memo').value='';
+  document.getElementById('modal-revive').classList.remove('hidden');
+}
+async function executeRevive(){
+  const reason=document.getElementById('revive-reason').value.trim();
+  if(!reason) return showToast('復活理由を入力してください','error');
+  const memo=document.getElementById('revive-memo').value;
+  try{
+    const res=await callGas('revivePrepaid',{patient_number:APP.currentPatient.patient_number,reason,memo});
+    APP.currentExpiry=res.expiry_date; updateBalanceDisplay();
+    closeModal('modal-revive');
+    showToast(`復活完了！新有効期限: ${res.expiry_date}`,'success');
+    loadPrepaidHistory();
+  }catch(e){showToast(e.message,'error');}
+}
+
+function openCancelModal(txn){
+  APP.cancelTarget=txn;
+  document.getElementById('cancel-memo').value='';
+  document.getElementById('cancel-target-info').innerHTML=`
+    <div>日付: ${txn.date} ／ 区分: ${txn.type}</div>
+    <div>入金額: ${Number(txn.payment_amount||0).toLocaleString()}円 ／ 付与: ${Number(txn.bonus_points||0).toLocaleString()}pt</div>
+    <div>利用: ${Number(txn.used_points||0).toLocaleString()}pt ／ 残高: ${Number(txn.balance_after||0).toLocaleString()}pt</div>`;
+  document.getElementById('modal-cancel').classList.remove('hidden');
+}
+async function executeCancel(){
+  const memo=document.getElementById('cancel-memo').value;
+  try{
+    const res=await callGas('cancelPrepaid',{transaction_id:APP.cancelTarget.transaction_id,memo});
+    APP.currentBalance=res.balance_after; updateBalanceDisplay();
+    closeModal('modal-cancel');
+    showToast(`取消完了！残高: ${res.balance_after.toLocaleString()}pt`,'success');
+    loadPrepaidHistory();
+  }catch(e){showToast(e.message,'error');}
+}
+
+// =============================================
+// 履歴
+// =============================================
+async function loadPrepaidHistory(){
+  const tbody=document.getElementById('prepaid-history-body');
+  tbody.innerHTML='<tr><td colspan="9" class="loading"><div class="spinner"></div>読み込み中...</td></tr>';
+  try{
+    const res=await callGas('getPrepaidHistory',{patient_number:APP.currentPatient.patient_number});
+    const txns=res.transactions;
+    const active=txns.filter(t=>!t.canceled);
+    if(active.length){
+      APP.currentBalance=Number(active[0].balance_after)||0;
+      APP.currentExpiry=active[0].expiry_date||'';
+      updateBalanceDisplay();
+    }
+    if(!txns.length){tbody.innerHTML='<tr><td colspan="9" class="empty">履歴がありません</td></tr>';return;}
+    tbody.innerHTML='';
+    txns.forEach(t=>{
+      const tr=document.createElement('tr');
+      if(t.canceled) tr.classList.add('canceled');
+      tr.innerHTML=`
+        <td>${t.date}</td>
+        <td><span class="type-badge type-${t.type}">${t.type}</span>${t.canceled?'<span class="badge badge-err" style="margin-left:4px">取消済</span>':''}</td>
+        <td>${t.payment_amount>0?Number(t.payment_amount).toLocaleString()+'円':'-'}</td>
+        <td>${t.bonus_points>0?'+'+Number(t.bonus_points).toLocaleString()+'pt':'-'}</td>
+        <td>${t.used_points>0?'-'+Number(t.used_points).toLocaleString()+'pt':'-'}</td>
+        <td><strong>${Number(t.balance_after).toLocaleString()}pt</strong></td>
+        <td>${formatDate(t.expiry_date)||'-'}</td>
+        <td><span class="badge badge-gray" style="font-size:.75rem">${esc(t.payment_method||'-')}</span></td>
+        <td style="max-width:150px;font-size:.82rem">${esc(t.memo||'')}</td>
+        <td>${!t.canceled&&(t.type==='入金'||t.type==='利用')?`<button class="btn btn-sm btn-danger" onclick='openCancelModal(${JSON.stringify(t)})'>取消</button>`:''}</td>`;
+      tbody.appendChild(tr);
+    });
+  }catch(e){tbody.innerHTML=`<tr><td colspan="9" class="empty" style="color:var(--red)">❌ ${esc(e.message)}</td></tr>`;}
+}
+
+async function loadAllHistory(){
+  const tbody=document.getElementById('all-history-body');
+  tbody.innerHTML='<tr><td colspan="7" class="loading"><div class="spinner"></div>読み込み中...</td></tr>';
+  try{
+    const res=await callGas('getPrepaidHistory',{patient_number:APP.currentPatient.patient_number});
+    const txns=res.transactions;
+    if(!txns.length){tbody.innerHTML='<tr><td colspan="7" class="empty">履歴がありません</td></tr>';return;}
+    tbody.innerHTML='';
+    txns.forEach(t=>{
+      const tr=document.createElement('tr');
+      if(t.canceled) tr.classList.add('canceled');
+      const amount=t.payment_amount>0?'+'+Number(t.payment_amount).toLocaleString()+'円 (+'+Number(t.bonus_points).toLocaleString()+'pt)':t.used_points>0?'-'+Number(t.used_points).toLocaleString()+'pt':'-';
+      tr.innerHTML=`
+        <td>${t.date}</td>
+        <td><span class="badge badge-gray">プリペイド</span></td>
+        <td><span class="type-badge type-${t.type}">${t.type}</span></td>
+        <td>${amount}</td>
+        <td><strong>${Number(t.balance_after).toLocaleString()}pt</strong></td>
+        <td>${t.expiry_date||'-'}</td>
+        <td style="font-size:.82rem">${esc(t.memo||'')}</td>`;
+      tbody.appendChild(tr);
+    });
+  }catch(e){tbody.innerHTML=`<tr><td colspan="7" class="empty" style="color:var(--red)">❌ ${esc(e.message)}</td></tr>`;}
+}
+
+// =============================================
+// 第2段階：アラート
+// =============================================
+let currentAlertDays = 7;
+
+function setAlertDays(btn, days) {
+  currentAlertDays = days;
+  document.querySelectorAll('.alert-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadAlerts();
+}
+
+async function loadTopAlertSummary() {
+  const area = document.getElementById('top-alert-summary');
+  if (!APP.gasUrl) { area.innerHTML='<div class="empty">GAS URLを設定すると表示されます</div>'; return; }
+  area.innerHTML='<div class="loading"><div class="spinner"></div>確認中...</div>';
+  try {
+    const res = await callGas('getAlerts',{days:30});
+    const alerts = res.alerts;
+    if (!alerts.length) { area.innerHTML='<div class="empty">⚪ 期限が近い方はいません（30日以内）</div>'; return; }
+
+    const expired = alerts.filter(a => a.is_expired);
+    const near7 = alerts.filter(a => !a.is_expired && a.days_left <= 7);
+    const near30 = alerts.filter(a => !a.is_expired && a.days_left > 7);
+
+    let html = '';
+    if (expired.length) html += `<div style="padding:10px 14px;background:var(--red-light);border-radius:var(--radius-sm);margin-bottom:8px;color:var(--red);font-weight:700">⛔ 期限切れ ${expired.length}名</div>`;
+    if (near7.length) html += `<div style="padding:10px 14px;background:#FFF7E0;border-radius:var(--radius-sm);margin-bottom:8px;color:#B8860B;font-weight:700">⚠️ 1週間以内 ${near7.length}名</div>`;
+    if (near30.length) html += `<div style="padding:10px 14px;background:var(--sun-light);border-radius:var(--radius-sm);margin-bottom:8px;color:var(--sun-dark);font-weight:700">📅 30日以内 ${near30.length}名</div>`;
+
+    // 最大5件表示
+    const preview = alerts.slice(0,5);
+    const ul = document.createElement('ul');
+    ul.className = 'alert-list';
+    preview.forEach(a => {
+      const li = createAlertItem(a, true);
+      ul.appendChild(li);
+    });
+    area.innerHTML = html;
+    area.appendChild(ul);
+    if (alerts.length > 5) {
+      const more = document.createElement('div');
+      more.style.cssText = 'text-align:center;padding:10px';
+      more.innerHTML = `<button class="btn btn-outline btn-sm" onclick="showPage('alerts')">全${alerts.length}件を確認する →</button>`;
+      area.appendChild(more);
+    }
+  } catch(e) {
+    area.innerHTML=`<div class="empty" style="color:var(--red)">接続エラー: ${esc(e.message)}</div>`;
+  }
+}
+
+async function loadAlerts() {
+  const area = document.getElementById('alert-unchecked-area');
+  area.innerHTML='<div class="loading"><div class="spinner"></div>読み込み中...</div>';
+  const days = currentAlertDays === 0 ? 9999 : currentAlertDays;
+  try {
+    const res = await callGas('getAlerts',{days});
+    const alerts = res.alerts;
+    if (!alerts.length) { area.innerHTML='<div class="empty">⚪ 該当する方はいません</div>'; return; }
+    const ul = document.createElement('ul');
+    ul.className = 'alert-list';
+    alerts.forEach(a => ul.appendChild(createAlertItem(a, false)));
+    area.innerHTML='';
+    area.appendChild(ul);
+  } catch(e) {
+    area.innerHTML=`<div class="empty" style="color:var(--red)">❌ ${esc(e.message)}</div>`;
+  }
+}
+
+function createAlertItem(a, compact) {
+  const li = document.createElement('li');
+  li.className = 'alert-item' + (a.is_expired ? ' expired' : '');
+  const daysText = a.is_expired
+    ? `<div class="days" style="color:var(--red)">期限切れ</div>`
+    : `<div class="days">${a.days_left}日後</div>`;
+  li.innerHTML = `
+    <div class="alert-expiry ${a.is_expired?'expired':'near'}">
+      ${a.expiry_date}${daysText}
+    </div>
+    <div class="alert-info">
+      <div class="alert-name">${esc(a.patient_name)}（No.${a.patient_number}）</div>
+      <div class="alert-detail">${esc(a.type)} ／ 残高: ${esc(a.balance_or_count)}</div>
+    </div>
+    <button class="btn btn-sm btn-outline" onclick="loadAndOpenPatient('${a.patient_number}')">開く</button>
+    <button class="btn btn-sm btn-gray" onclick="doCheckAlert(this,'${a.patient_number}','${a.type}','${a.expiry_date}')">✅ 確認済み</button>`;
+  return li;
+}
+
+async function doCheckAlert(btn, patientNumber, type, expiry) {
+  const memo = '';
+  try {
+    await callGas('checkAlert',{patient_number:patientNumber,target_type:type,expiry_date:expiry,memo});
+    btn.closest('li').style.opacity='0.3';
+    setTimeout(()=>{ btn.closest('li').remove(); }, 400);
+    showToast('確認済みにしました','success');
+    loadTopAlertSummary();
+    loadCheckedAlerts();
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+async function loadCheckedAlerts() {
+  const area = document.getElementById('alert-checked-area');
+  area.innerHTML='<div class="loading"><div class="spinner"></div>読み込み中...</div>';
+  try {
+    const res = await callGas('getCheckedAlerts',{});
+    const alerts = res.alerts;
+    if (!alerts.length) { area.innerHTML='<div class="empty">確認済み履歴はありません</div>'; return; }
+    const ul = document.createElement('ul');
+    ul.className = 'checked-list';
+    alerts.forEach(a => {
+      const li = document.createElement('li');
+      li.className = 'checked-item';
+      li.innerHTML = `
+        <span class="checked-date">✅ ${String(a.checked_at).slice(0,10)}</span>
+        <span>${esc(a.patient_name)}（No.${a.patient_number}）</span>
+        <span style="margin-left:8px;color:var(--text-sub);font-size:.82rem">期限: ${a.expiry_date}</span>`;
+      ul.appendChild(li);
+    });
+    area.innerHTML='';
+    area.appendChild(ul);
+  } catch(e) {
+    area.innerHTML=`<div class="empty" style="color:var(--red)">❌ ${esc(e.message)}</div>`;
+  }
+}
+
+// =============================================
+// 第2段階：操作ログ
+// =============================================
+const LOG_ACTION_LABELS = {
+  registerPatient:'患者登録',addPrepaidPayment:'入金',addPrepaidUsage:'利用',
+  cancelPrepaid:'取消',revivePrepaid:'復活',checkAlert:'アラート確認',
+  updatePatient:'患者更新',
+};
+
+async function loadLogs() {
+  const area = document.getElementById('log-area');
+  const pnum = document.getElementById('log-patient-filter').value.trim();
+  area.innerHTML='<div class="loading"><div class="spinner"></div>読み込み中...</div>';
+  try {
+    const res = await callGas('getLogs',{patient_number:pnum||undefined,limit:200});
+    const logs = res.logs;
+    if (!logs.length) { area.innerHTML='<div class="empty">ログがありません</div>'; return; }
+    const ul = document.createElement('ul');
+    ul.className = 'log-list';
+    logs.forEach(l => {
+      const li = document.createElement('li');
+      li.className = 'log-item';
+      let detail = '';
+      try {
+        const d = typeof l.detail==='string' ? JSON.parse(l.detail) : l.detail;
+        if (d && typeof d === 'object') {
+          if (d.payAmount) detail = `入金 ${Number(d.payAmount).toLocaleString()}円 → 残高 ${Number(d.balanceAfter).toLocaleString()}pt`;
+          else if (d.useAmount) detail = `利用 ${Number(d.useAmount).toLocaleString()}pt → 残高 ${Number(d.balanceAfter).toLocaleString()}pt`;
+          else if (d.reason) detail = `理由: ${d.reason}`;
+          else if (d.newExpiry) detail = `新期限: ${d.newExpiry}`;
+          else detail = JSON.stringify(d);
+        } else detail = String(l.detail||'');
+      } catch { detail = String(l.detail||''); }
+
+      const label = LOG_ACTION_LABELS[l.action] || l.action;
+      li.innerHTML = `
+        <div class="log-time">${String(l.date_time).slice(0,16)}<br><span style="font-size:.75rem">${l.patient_name?esc(l.patient_name):''}${l.patient_number?' No.'+l.patient_number:''}</span></div>
+        <div class="log-action ${l.action}">${label}</div>
+        <div class="log-detail">${esc(detail)}</div>`;
+      ul.appendChild(li);
+    });
+    area.innerHTML='';
+    area.appendChild(ul);
+  } catch(e) {
+    area.innerHTML=`<div class="empty" style="color:var(--red)">❌ ${esc(e.message)}</div>`;
+  }
+}
+
+// =============================================
+// メモ編集
+// =============================================
+function openMemoModal() {
+  document.getElementById('edit-memo').value = APP.currentPatient.memo || '';
+  document.getElementById('modal-memo').classList.remove('hidden');
+}
+async function saveMemo() {
+  const memo = document.getElementById('edit-memo').value;
+  try {
+    await callGas('updatePatient',{patient_number:APP.currentPatient.patient_number,memo});
+    APP.currentPatient.memo=memo;
+    document.getElementById('ph-memo').textContent=memo;
+    closeModal('modal-memo');
+    showToast('メモを保存しました','success');
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+function printPatient() {
+  document.body.classList.remove('printing-summary');
+  document.body.classList.add('printing-patient');
+  window.print();
+  setTimeout(() => document.body.classList.remove('printing-patient'), 1000);
+}
+
+function printSummary() {
+  if (!document.getElementById('summary-area').innerHTML.trim() ||
+      document.getElementById('summary-area').innerHTML.includes('loading')) {
+    return showToast('先に集計してください','error');
+  }
+  document.body.classList.remove('printing-patient');
+  document.body.classList.add('printing-summary');
+  window.print();
+  setTimeout(() => document.body.classList.remove('printing-summary'), 1000);
+}
+
+// =============================================
+// 確認モーダル・共通
+// =============================================
+function showConfirmModal(title, body, callback) {
+  document.getElementById('modal-confirm-title').textContent=title;
+  document.getElementById('modal-confirm-body').innerHTML=body;
+  document.getElementById('modal-confirm-ok').onclick=callback;
+  document.getElementById('modal-confirm').classList.remove('hidden');
+}
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click',e=>{ if(e.target===el) el.classList.add('hidden'); });
+});
+
+// =============================================
+// ユーティリティ
+// =============================================
+function formatDate(val) {
+  if (!val) return '';
+  const s = String(val);
+  if (s.includes('T')) return s.slice(0, 10);
+  if (s.length >= 10) return s.slice(0, 10);
+  return s;
+}
+function todayStr(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function daysUntil(dateStr){
+  if(!dateStr) return 999;
+  const t=new Date(dateStr),n=new Date();
+  n.setHours(0,0,0,0);
+  return Math.ceil((t-n)/(1000*60*60*24));
+}
+function isExpirySoon(dateStr){ const d=daysUntil(dateStr); return d>=0&&d<=30; }
+function isExpired(dateStr){ if(!dateStr) return false; return daysUntil(dateStr)<0; }
+function esc(str){ return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showToast(msg,type=''){
+  const c=document.getElementById('toast-container');
+  const d=document.createElement('div');
+  d.className='toast '+type; d.textContent=msg;
+  c.appendChild(d); setTimeout(()=>d.remove(),3500);
+}
+
+// =============================================
+// 第3段階：サブスク管理
+// =============================================
+let currentSubTarget = null;
+let subEndMode = '';
+
+async function loadSubscriptionProducts() {
+  try {
+    const res = await callGas('getSubscriptionProducts', {});
+    APP.subscriptionProducts = res.products || [];
+    const sel = document.getElementById('sub-product-select');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">-- 商品を選択 --</option>';
+    APP.subscriptionProducts.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.product_id;
+      opt.textContent = `${p.product_name}（${Number(p.price).toLocaleString()}円 / ${p.period_months>0?p.period_months+'ヶ月':p.period_days+'日'}）`;
+      sel.appendChild(opt);
+    });
+    sel.onchange = () => showSubProductPreview();
+  } catch(e) { /* 未接続の場合は無視 */ }
+}
+
+function showSubProductPreview() {
+  const pid = document.getElementById('sub-product-select').value;
+  const preview = document.getElementById('sub-product-preview');
+  if (!pid) { preview.style.display='none'; return; }
+  const p = APP.subscriptionProducts.find(p => p.product_id === pid);
+  if (!p) return;
+  preview.style.display = 'block';
+  preview.innerHTML = `<div class="calc-preview">
+    <div class="calc-row"><span>商品名</span><span>${esc(p.product_name)}</span></div>
+    <div class="calc-row"><span>金額</span><span>${Number(p.price).toLocaleString()}円</span></div>
+    <div class="calc-row total"><span>契約期間</span><span>${p.period_months>0?p.period_months+'ヶ月':p.period_days+'日'}</span></div>
+  </div>`;
+}
+
+async function loadSubscriptions() {
+  const area = document.getElementById('sub-list-area');
+  if (!area) return;
+  area.innerHTML = '<div class="loading"><div class="spinner"></div>読み込み中...</div>';
+  try {
+    const res = await callGas('getSubscriptions', {patient_number: APP.currentPatient.patient_number});
+    const subs = res.subscriptions;
+    if (!subs.length) { area.innerHTML = ''; loadSubscriptionProducts(); loadSubHistory(); return; }
+
+    let html = '';
+    subs.forEach(s => {
+      const expired = isExpired(String(s.expiry_date));
+      const warn = isExpirySoon(String(s.expiry_date));
+      const statusColor = s.status==='契約中' ? 'var(--green)' : s.status==='停止' ? '#B8860B' : 'var(--text-sub)';
+      const daysLeft = daysUntil(String(s.expiry_date));
+      html += `<div class="card" style="margin-bottom:16px;border-left:4px solid ${statusColor}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font-size:1.1rem;font-weight:700">${esc(s.product_name)}</div>
+            <div style="font-size:.85rem;color:var(--text-sub);margin-top:4px">開始日: ${s.start_date}</div>
+          </div>
+          <span class="badge" style="background:${statusColor}20;color:${statusColor}">${s.status}</span>
+        </div>
+        <div style="margin:14px 0;padding:12px;background:var(--sun-bg);border-radius:8px">
+          <div style="font-size:.85rem;color:var(--text-sub)">有効期限</div>
+          <div style="font-size:1.4rem;font-weight:700;color:${expired?'var(--red)':warn?'#B8860B':'var(--sun-deep)'}">
+            ${s.expiry_date}
+            <span style="font-size:.85rem;font-weight:400;margin-left:8px">${expired?'期限切れ':daysLeft+'日後'}</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${s.status==='契約中'||s.status==='停止' ? `<button class="btn btn-primary btn-sm" onclick="openRenewModal('${s.subscription_id}','${esc(s.product_name)}','${s.expiry_date}')">🔄 継続</button>` : ''}
+          ${s.status==='契約中' ? `<button class="btn btn-outline btn-sm" onclick="openExtendModal('${s.subscription_id}','${esc(s.product_name)}','${s.expiry_date}')">📅 延長</button>` : ''}
+          ${s.status==='契約中' ? `<button class="btn btn-gray btn-sm" onclick="openSubEndModal('${s.subscription_id}','${esc(s.product_name)}','stop')">⏸ 停止</button>` : ''}
+          ${s.status!=='終了' ? `<button class="btn btn-danger btn-sm" onclick="openSubEndModal('${s.subscription_id}','${esc(s.product_name)}','end')">⏹ 終了</button>` : ''}
+        </div>
+        ${s.memo?`<div style="margin-top:8px;font-size:.82rem;color:var(--text-sub)">メモ: ${esc(s.memo)}</div>`:''}
+      </div>`;
+    });
+    area.innerHTML = html;
+    loadSubscriptionProducts();
+    loadTicketProductsList();
+    loadPaymentMethodsList();
+    loadSubHistory();
+  } catch(e) { area.innerHTML = `<div class="empty" style="color:var(--red)">❌ ${esc(e.message)}</div>`; }
+}
+
+async function loadSubHistory() {
+  const tbody = document.getElementById('sub-history-body');
+  if (!tbody) return;
+  try {
+    const res = await callGas('getSubscriptionHistory', {patient_number: APP.currentPatient.patient_number});
+    const txns = res.transactions;
+    if (!txns.length) { tbody.innerHTML='<tr><td colspan="8" class="empty">履歴がありません</td></tr>'; return; }
+    tbody.innerHTML = '';
+    txns.forEach(t => {
+      const tr = document.createElement('tr');
+      const typeColors = {'継続':'var(--green)','延長':'var(--blue)','停止':'#B8860B','終了':'var(--red)','契約開始':'var(--purple)'};
+      tr.innerHTML = `
+        <td>${t.date}</td>
+        <td>${esc(t.product_name)}</td>
+        <td><span class="type-badge" style="background:${typeColors[t.type]||'#eee'}20;color:${typeColors[t.type]||'#888'}">${t.type}</span></td>
+        <td>${t.amount>0?Number(t.amount).toLocaleString()+'円':'-'}</td>
+        <td><span class="badge badge-gray" style="font-size:.75rem">${esc(t.payment_method||'-')}</span></td>
+        <td>${t.extension_days>0?t.extension_days+'日':'-'}</td>
+        <td style="font-size:.82rem">${t.expiry_before||'-'}</td>
+        <td style="font-size:.82rem">${t.expiry_after||'-'}</td>
+        <td style="font-size:.82rem">${esc(t.memo||'')}</td>`;
+      tbody.appendChild(tr);
+    });
+  } catch(e) {}
+}
+
+function confirmAddSubscription() {
+  const pid = document.getElementById('sub-product-select').value;
+  if (!pid) return showToast('商品を選択してください','error');
+  const p = APP.subscriptionProducts.find(p => p.product_id === pid);
+  const startDate = document.getElementById('sub-start-date').value;
+  if (!startDate) return showToast('開始日を入力してください','error');
+  const memo = document.getElementById('sub-new-memo').value;
+  const period = p.period_months>0 ? p.period_months+'ヶ月' : p.period_days+'日';
+  showConfirmModal('✅ サブスク契約開始',
+    `<div class="calc-preview">
+      <div class="calc-row"><span>患者</span><span>${esc(APP.currentPatient.patient_name)}</span></div>
+      <div class="calc-row"><span>商品</span><span>${esc(p.product_name)}</span></div>
+      <div class="calc-row"><span>金額</span><span>${Number(p.price).toLocaleString()}円</span></div>
+      <div class="calc-row"><span>開始日</span><span>${startDate}</span></div>
+      <div class="calc-row total"><span>契約期間</span><span>${period}</span></div>
+    </div>`,
+    async () => {
+      closeModal('modal-confirm');
+      try {
+        const subNewMethod=document.getElementById('sub-new-method').value;
+        await callGas('addSubscription',{patient_number:APP.currentPatient.patient_number,product_id:pid,start_date:startDate,memo,payment_method:subNewMethod});
+        showToast(`${p.product_name}の契約を開始しました`,'success');
+        document.getElementById('sub-product-select').value='';
+        document.getElementById('sub-new-memo').value='';
+        document.getElementById('sub-product-preview').style.display='none';
+        loadSubscriptions();
+      } catch(e) { showToast(e.message,'error'); }
+    }
+  );
+}
+
+function openRenewModal(subId, productName, expiry) {
+  currentSubTarget = subId;
+  document.getElementById('sub-renew-memo').value = '';
+  document.getElementById('sub-renew-info').innerHTML = `
+    <div style="font-size:1rem;font-weight:700;margin-bottom:6px">${esc(productName)}</div>
+    <div>現在の有効期限: <strong>${expiry}</strong></div>
+    <div style="margin-top:6px;color:var(--text-sub);font-size:.85rem">継続ボタンを押すと、支払い済みとして記録し契約期間分延長します。</div>`;
+  // 支払い方法を更新
+  loadPaymentMethodsList();
+  document.getElementById('modal-sub-renew').classList.remove('hidden');
+}
+async function executeRenew() {
+  const memo = document.getElementById('sub-renew-memo').value;
+  try {
+    const method = document.getElementById('sub-renew-method').value;
+    const res = await callGas('renewSubscription',{subscription_id:currentSubTarget,memo,payment_method:method});
+    closeModal('modal-sub-renew');
+    showToast(`継続完了！新有効期限: ${res.expiry_date}（${Number(res.price).toLocaleString()}円）`,'success');
+    loadSubscriptions();
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+function openExtendModal(subId, productName, expiry) {
+  currentSubTarget = subId;
+  document.getElementById('sub-extend-days').value = '';
+  document.getElementById('sub-extend-memo').value = '';
+  document.getElementById('sub-extend-info').innerHTML = `
+    <div style="font-weight:700;margin-bottom:6px">${esc(productName)}</div>
+    <div>現在の有効期限: <strong>${expiry}</strong></div>`;
+  document.getElementById('modal-sub-extend').classList.remove('hidden');
+}
+async function executeExtend() {
+  const days = parseInt(document.getElementById('sub-extend-days').value)||0;
+  const memo = document.getElementById('sub-extend-memo').value;
+  if (!days) return showToast('延長日数を入力してください','error');
+  try {
+    const res = await callGas('extendSubscription',{subscription_id:currentSubTarget,days,memo});
+    closeModal('modal-sub-extend');
+    showToast(`${days}日延長しました！新有効期限: ${res.expiry_date}`,'success');
+    loadSubscriptions();
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+function openSubEndModal(subId, productName, mode) {
+  currentSubTarget = subId;
+  subEndMode = mode;
+  document.getElementById('sub-end-memo').value = '';
+  document.getElementById('modal-sub-end-title').textContent = mode==='stop' ? '⏸ サブスク停止' : '⏹ サブスク終了';
+  document.getElementById('sub-end-ok-btn').textContent = mode==='stop' ? '停止する' : '終了する';
+  document.getElementById('sub-end-info').innerHTML = `<div style="font-weight:700">${esc(productName)}</div><div style="margin-top:4px;color:${mode==='end'?'var(--red)':'#B8860B'}">${mode==='stop'?'一時停止にします。継続ボタンで再開できます。':'完全に終了します。この操作は取り消せません。'}</div>`;
+  document.getElementById('modal-sub-end').classList.remove('hidden');
+}
+async function executeSubEnd() {
+  const memo = document.getElementById('sub-end-memo').value;
+  try {
+    const action = subEndMode==='stop' ? 'stopSubscription' : 'endSubscription';
+    await callGas(action,{subscription_id:currentSubTarget,memo});
+    closeModal('modal-sub-end');
+    showToast(subEndMode==='stop'?'停止しました':'終了しました','success');
+    loadSubscriptions();
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+// 商品マスター表示
+async function loadSubProductsMaster() {
+  const area = document.getElementById('sub-products-area');
+  if (!area) return;
+  try {
+    const res = await callGas('getSubscriptionProducts',{});
+    const products = res.products;
+    if (!products.length) { area.innerHTML='<div class="empty">商品が登録されていません</div>'; return; }
+    const ul = document.createElement('ul');
+    ul.style.cssText = 'list-style:none';
+    products.forEach(p => {
+      const li = document.createElement('li');
+      li.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--sun-light)';
+      li.innerHTML = `
+        <div style="flex:1">
+          <div style="font-weight:700">${esc(p.product_name)}</div>
+          <div style="font-size:.82rem;color:var(--text-sub)">${Number(p.price).toLocaleString()}円 / ${p.period_months>0?p.period_months+'ヶ月':p.period_days+'日'}</div>
+        </div>
+        <button class="btn btn-sm btn-outline sub-prod-edit-btn">編集</button>`;
+      li.querySelector('.sub-prod-edit-btn').addEventListener('click', () => openProductModal(p));
+      ul.appendChild(li);
+    });
+    area.innerHTML = '';
+    area.appendChild(ul);
+  } catch(e) { area.innerHTML = `<div class="empty" style="color:var(--red)">❌ ${esc(e.message)}</div>`; }
+}
+
+function openProductModal(product) {
+  APP.editingProduct = product;
+  document.getElementById('modal-product-title').textContent = product ? '商品編集' : '商品登録';
+  document.getElementById('prod-name').value = product ? product.product_name : '';
+  document.getElementById('prod-price').value = product ? product.price : '';
+  document.getElementById('prod-months').value = product ? product.period_months : '1';
+  document.getElementById('prod-days').value = product ? product.period_days : '0';
+  document.getElementById('prod-memo').value = product ? (product.memo||'') : '';
+  document.getElementById('modal-product').classList.remove('hidden');
+}
+async function saveProduct() {
+  const name = document.getElementById('prod-name').value.trim();
+  if (!name) return showToast('商品名を入力してください','error');
+  const data = {
+    product_name: name,
+    price: parseInt(document.getElementById('prod-price').value)||0,
+    period_months: parseInt(document.getElementById('prod-months').value)||0,
+    period_days: parseInt(document.getElementById('prod-days').value)||0,
+    memo: document.getElementById('prod-memo').value,
+  };
+  if (APP.editingProduct) data.product_id = APP.editingProduct.product_id;
+  try {
+    await callGas('saveSubscriptionProduct', data);
+    closeModal('modal-product');
+    showToast('保存しました','success');
+    await loadSubscriptionProducts();
+    loadSubProductsMaster();
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+
+// =============================================
+// 第4段階：回数券管理
+// =============================================
+let currentTicketTarget = null;
+let currentTicketCancelTxn = null;
+
+async function loadTicketProductsList() {
+  try {
+    const res = await callGas('getTicketProducts', {});
+    APP.ticketProducts = res.products || [];
+    const categories = res.categories || [];
+    const sel = document.getElementById('ticket-product-select');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">-- 商品を選択 --</option>';
+    // カテゴリーごとにoptgroupで整理
+    if (categories.length > 0) {
+      categories.forEach(cat => {
+        const group = document.createElement('optgroup');
+        group.label = cat;
+        APP.ticketProducts.filter(p => (p.category||'その他') === cat).forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.product_id;
+          opt.textContent = `${p.product_name}（${Number(p.price).toLocaleString()}円 / ${p.initial_count}回）`;
+          group.appendChild(opt);
+        });
+        sel.appendChild(group);
+      });
+    } else {
+      APP.ticketProducts.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.product_id;
+        opt.textContent = `${p.product_name}（${Number(p.price).toLocaleString()}円 / ${p.initial_count}回）`;
+        sel.appendChild(opt);
+      });
+    }
+    sel.onchange = showTicketProductPreview;
+  } catch(e) {}
+}
+
+function showTicketProductPreview() {
+  const pid = document.getElementById('ticket-product-select').value;
+  const preview = document.getElementById('ticket-product-preview');
+  if (!pid) { preview.style.display='none'; return; }
+  const p = APP.ticketProducts.find(p => p.product_id === pid);
+  if (!p) return;
+  preview.style.display = 'block';
+  preview.innerHTML = `<div class="calc-preview">
+    ${p.category?`<div class="calc-row"><span>カテゴリー</span><span><span class="badge badge-purple">${esc(p.category)}</span></span></div>`:''}
+    <div class="calc-row"><span>商品名</span><span>${esc(p.product_name)}</span></div>
+    <div class="calc-row"><span>販売価格</span><span>${Number(p.price).toLocaleString()}円</span></div>
+    <div class="calc-row"><span>回数</span><span>${p.initial_count}回</span></div>
+    <div class="calc-row total"><span>有効期間</span><span>購入日から${p.expiry_days}日</span></div>
+  </div>`;
+}
+
+async function loadTickets() {
+  const area = document.getElementById('ticket-list-area');
+  if (!area) return;
+  area.innerHTML = '<div class="loading"><div class="spinner"></div>読み込み中...</div>';
+  try {
+    const res = await callGas('getTickets', {patient_number: APP.currentPatient.patient_number});
+    const tickets = res.tickets;
+    if (!tickets.length) { area.innerHTML = ''; loadTicketProductsList(); loadTicketHistory(); return; }
+    // 残回数0の券：同じproduct_idまたは同じカテゴリーで有効な券があれば非表示
+    const filteredTickets = tickets.filter(t => {
+      if (Number(t.remaining_count) > 0) return true; // 残回数あり→常に表示
+      const tCat = String((t.product||{}).category || t.category || '');
+      const hasActive = tickets.some(other => {
+        if (other.ticket_id === t.ticket_id) return false;
+        if (Number(other.remaining_count) <= 0) return false;
+        // 同じ商品IDなら非表示
+        if (String(other.product_id) === String(t.product_id)) return true;
+        // カテゴリーが両方あって一致する場合も非表示
+        const oCat = String((other.product||{}).category || other.category || '');
+        return tCat && oCat && tCat === oCat;
+      });
+      return !hasActive;
+    });
+
+    let html = '';
+    filteredTickets.forEach(t => {
+      const expired = isExpired(formatDate(t.expiry_date));
+      const warn = isExpirySoon(formatDate(t.expiry_date));
+      const isEmpty = Number(t.remaining_count) <= 0;
+      const statusColor = t.status==='有効' ? 'var(--green)' : t.status==='使用済' ? 'var(--text-sub)' : 'var(--red)';
+      const canUse = t.status==='有効' && !expired && !isEmpty;
+      const remaining = Number(t.remaining_count);
+      const initial = Number(t.initial_count);
+      const pct = initial > 0 ? Math.round(remaining/initial*100) : 0;
+
+      html += `<div class="card" style="margin-bottom:16px;border-left:4px solid ${statusColor}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font-size:1.1rem;font-weight:700">${esc(t.product_name)}</div>
+            <div style="font-size:.85rem;color:var(--text-sub);margin-top:4px">購入日: ${formatDate(t.purchase_date)}</div>
+          </div>
+          <span class="badge" style="background:${statusColor}20;color:${statusColor}">${t.status}</span>
+        </div>
+        <div style="margin:14px 0;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div style="padding:12px;background:var(--sun-bg);border-radius:8px;text-align:center">
+            <div style="font-size:.82rem;color:var(--text-sub)">残回数</div>
+            <div style="font-size:2rem;font-weight:700;color:${isEmpty?'var(--red)':warn?'#B8860B':'var(--sun-deep)'}">
+              ${remaining}<span style="font-size:.9rem;font-weight:400"> / ${initial}回</span>
+            </div>
+            <div style="margin-top:6px;height:6px;background:#eee;border-radius:3px">
+              <div style="height:6px;background:${isEmpty?'var(--red)':'var(--sun)'};border-radius:3px;width:${pct}%"></div>
+            </div>
+          </div>
+          <div style="padding:12px;background:var(--sun-bg);border-radius:8px;text-align:center">
+            <div style="font-size:.82rem;color:var(--text-sub)">有効期限</div>
+            <div style="font-size:1.1rem;font-weight:700;color:${expired?'var(--red)':warn?'#B8860B':'var(--sun-deep)'}">
+              ${formatDate(t.expiry_date)}
+            </div>
+            <div style="font-size:.8rem;color:var(--text-sub);margin-top:4px">${expired?'期限切れ':daysUntil(formatDate(t.expiry_date))+'日後'}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${canUse ? `<button class="btn btn-success btn-sm" onclick="openTicketUseModal('${t.ticket_id}','${esc(t.product_name)}',${remaining})">🏥 本日使用</button>` : ''}
+          ${t.status!=='使用済' ? `<button class="btn btn-gray btn-sm" onclick="loadTicketHistory('${t.ticket_id}')">📋 この券の履歴</button>` : ''}
+        </div>
+        ${t.memo?`<div style="margin-top:8px;font-size:.82rem;color:var(--text-sub)">メモ: ${esc(t.memo)}</div>`:''}
+      </div>`;
+    });
+    area.innerHTML = html;
+    loadTicketProductsList();
+    loadTicketHistory();
+  } catch(e) { area.innerHTML = `<div class="empty" style="color:var(--red)">❌ ${esc(e.message)}</div>`; }
+}
+
+async function loadTicketHistory(ticketId) {
+  const tbody = document.getElementById('ticket-history-body');
+  if (!tbody) return;
+  try {
+    const params = {patient_number: APP.currentPatient.patient_number};
+    if (ticketId) params.ticket_id = ticketId;
+    const res = await callGas('getTicketHistory', params);
+    const txns = res.transactions;
+    if (!txns.length) { tbody.innerHTML='<tr><td colspan="8" class="empty">履歴がありません</td></tr>'; return; }
+    tbody.innerHTML = '';
+    txns.forEach(t => {
+      const tr = document.createElement('tr');
+      const typeColors = {'購入':'var(--green)','使用':'var(--blue)','取消':'var(--red)'};
+      const isCancelable = t.type === '使用';
+      tr.innerHTML = `
+        <td>${formatDate(t.date)}</td>
+        <td>${esc(t.product_name)}</td>
+        <td><span class="type-badge" style="background:${typeColors[t.type]||'#eee'}20;color:${typeColors[t.type]||'#888'}">${t.type}</span></td>
+        <td>${t.count_change > 0 ? '+'+t.count_change+'回' : t.count_change+'回'}</td>
+        <td><strong>${t.remaining_after}回</strong></td>
+        <td style="font-size:.82rem">${formatDate(t.expiry_date)||'-'}</td>
+        <td><span class="badge badge-gray" style="font-size:.75rem">${esc(t.payment_method||'-')}</span></td>
+        <td style="font-size:.82rem">${esc(t.memo||'')}</td>
+        <td>${isCancelable?`<button class="btn btn-sm btn-danger" onclick='openTicketCancelModal(${JSON.stringify(t).replace(/"/g,"&quot;")})'>取消</button>`:''}</td>`;
+      tbody.appendChild(tr);
+    });
+  } catch(e) {}
+}
+
+function confirmPurchaseTicket() {
+  const pid = document.getElementById('ticket-product-select').value;
+  if (!pid) return showToast('商品を選択してください','error');
+  const p = APP.ticketProducts.find(p => p.product_id === pid);
+  const purchaseDate = document.getElementById('ticket-purchase-date').value;
+  if (!purchaseDate) return showToast('購入日を入力してください','error');
+  const memo = document.getElementById('ticket-new-memo').value;
+  showConfirmModal('🎫 回数券購入登録',
+    `<div class="calc-preview">
+      <div class="calc-row"><span>患者</span><span>${esc(APP.currentPatient.patient_name)}</span></div>
+      <div class="calc-row"><span>商品</span><span>${esc(p.product_name)}</span></div>
+      <div class="calc-row"><span>販売価格</span><span>${Number(p.price).toLocaleString()}円</span></div>
+      <div class="calc-row"><span>回数</span><span>${p.initial_count}回</span></div>
+      <div class="calc-row total"><span>有効期間</span><span>${purchaseDate} から${p.expiry_days}日間</span></div>
+    </div>`,
+    async () => {
+      closeModal('modal-confirm');
+      try {
+        const payMethod=document.getElementById('ticket-pay-method').value;
+        await callGas('purchaseTicket',{patient_number:APP.currentPatient.patient_number,product_id:pid,purchase_date:purchaseDate,memo,payment_method:payMethod});
+        showToast(`${p.product_name}を購入登録しました`,'success');
+        document.getElementById('ticket-product-select').value='';
+        document.getElementById('ticket-new-memo').value='';
+        document.getElementById('ticket-product-preview').style.display='none';
+        loadTickets();
+      } catch(e) { showToast(e.message,'error'); }
+    }
+  );
+}
+
+function openTicketUseModal(ticketId, productName, remaining) {
+  currentTicketTarget = ticketId;
+  document.getElementById('ticket-use-date').value = todayStr();
+  document.getElementById('ticket-use-memo').value = '';
+  document.getElementById('ticket-use-info').innerHTML = `
+    <div style="font-size:1rem;font-weight:700;margin-bottom:6px">${esc(productName)}</div>
+    <div>現在の残回数: <strong style="font-size:1.2rem;color:var(--sun-deep)">${remaining}回</strong></div>
+    <div style="margin-top:4px;color:var(--text-sub);font-size:.85rem">使用後: ${remaining-1}回になります</div>`;
+  document.getElementById('modal-ticket-use').classList.remove('hidden');
+}
+
+async function executeUseTicket() {
+  const date = document.getElementById('ticket-use-date').value;
+  const memo = document.getElementById('ticket-use-memo').value;
+  try {
+    const res = await callGas('useTicket',{ticket_id:currentTicketTarget,date,memo});
+    closeModal('modal-ticket-use');
+    showToast(`使用しました！残り${res.remaining_count}回`,'success');
+    loadTickets();
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+function openTicketCancelModal(txn) {
+  currentTicketCancelTxn = txn;
+  document.getElementById('ticket-cancel-memo').value = '';
+  document.getElementById('ticket-cancel-info').innerHTML = `
+    <div>日付: ${formatDate(txn.date)} ／ 商品: ${esc(txn.product_name||'')}</div>
+    <div>使用時残回数: ${txn.remaining_after}回 → 取消後: ${Number(txn.remaining_after)+1}回</div>`;
+  document.getElementById('modal-ticket-cancel').classList.remove('hidden');
+}
+
+async function executeTicketCancel() {
+  const memo = document.getElementById('ticket-cancel-memo').value;
+  try {
+    const res = await callGas('cancelTicketUse',{transaction_id:currentTicketCancelTxn.transaction_id,memo});
+    closeModal('modal-ticket-cancel');
+    showToast(`取消完了！残回数: ${res.remaining_count}回`,'success');
+    loadTickets();
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+// 回数券商品マスター
+async function loadTicketProductsMaster() {
+  const area = document.getElementById('ticket-products-area');
+  if (!area) return;
+  try {
+    const res = await callGas('getTicketProducts',{});
+    const products = res.products;
+    if (!products.length) { area.innerHTML='<div class="empty">商品が登録されていません</div>'; return; }
+    const ul = document.createElement('ul');
+    ul.style.cssText = 'list-style:none';
+    products.forEach(p => {
+      const li = document.createElement('li');
+      li.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--sun-light)';
+      li.innerHTML = `
+        <div style="flex:1">
+          <div style="font-weight:700">${esc(p.product_name)}</div>
+          <div style="font-size:.82rem;color:var(--text-sub)">${p.category?`<span class="badge badge-purple" style="font-size:.72rem;margin-right:4px">${esc(p.category)}</span>`:''} ${Number(p.price).toLocaleString()}円 / ${p.initial_count}回 / ${p.expiry_days}日間有効</div>
+        </div>
+        <button class="btn btn-sm btn-outline ticket-edit-btn">編集</button>`;
+      li.querySelector('.ticket-edit-btn').addEventListener('click', () => openTicketProductModal(p));
+      ul.appendChild(li);
+    });
+    area.innerHTML = '';
+    area.appendChild(ul);
+  } catch(e) { area.innerHTML = `<div class="empty" style="color:var(--red)">❌ ${esc(e.message)}</div>`; }
+}
+
+function openTicketProductModal(product) {
+  APP.editingTicketProduct = product;
+  document.getElementById('modal-ticket-product-title').textContent = product ? '回数券商品編集' : '回数券商品登録';
+  document.getElementById('tprod-category').value = product ? (product.category||'') : '';
+  document.getElementById('tprod-name').value = product ? product.product_name : '';
+  document.getElementById('tprod-price').value = product ? product.price : '';
+  document.getElementById('tprod-count').value = product ? product.initial_count : '';
+  document.getElementById('tprod-expiry').value = product ? (product.expiry_days||365) : '365';
+  document.getElementById('tprod-memo').value = product ? (product.memo||'') : '';
+  document.getElementById('modal-ticket-product').classList.remove('hidden');
+}
+
+async function saveTicketProduct() {
+  const name = document.getElementById('tprod-name').value.trim();
+  if (!name) return showToast('商品名を入力してください','error');
+  const data = {
+    product_name: name,
+    category: document.getElementById('tprod-category').value.trim(),
+    price: parseInt(document.getElementById('tprod-price').value)||0,
+    initial_count: parseInt(document.getElementById('tprod-count').value)||1,
+    expiry_days: parseInt(document.getElementById('tprod-expiry').value)||365,
+    memo: document.getElementById('tprod-memo').value,
+  };
+  if (APP.editingTicketProduct) data.product_id = APP.editingTicketProduct.product_id;
+  try {
+    await callGas('saveTicketProduct', data);
+    closeModal('modal-ticket-product');
+    showToast('保存しました','success');
+    APP.ticketProducts = (await callGas('getTicketProducts',{})).products || [];
+    loadTicketProductsList();
+    loadTicketProductsMaster();
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+
+// =============================================
+// 第5段階：集計・CSV出力
+// =============================================
+let lastSummaryData = null;
+
+function initSummaryPage() {
+  const today = todayStr();
+  const firstDay = today.slice(0,7) + '-01';
+  if (!document.getElementById('sum-start').value) document.getElementById('sum-start').value = firstDay;
+  if (!document.getElementById('sum-end').value)   document.getElementById('sum-end').value   = today;
+}
+
+async function loadSummary() {
+  const area = document.getElementById('summary-area');
+  area.innerHTML = '<div class="loading"><div class="spinner"></div>集計中...</div>';
+  const start  = document.getElementById('sum-start').value;
+  const end    = document.getElementById('sum-end').value;
+  const pnum   = document.getElementById('sum-patient').value.trim();
+  const type   = document.getElementById('sum-type').value;
+
+  try {
+    const res = await callGas('getSummary', {start_date:start, end_date:end, patient_number:pnum||undefined, type});
+    lastSummaryData = { res, start, end, pnum, type };
+    area.innerHTML = '';
+
+    if (type === 'all' || type === 'prepaid')      area.appendChild(buildPrepaidReport(res.prepaid, start, end));
+    if (type === 'all' || type === 'subscription') area.appendChild(buildSubReport(res.subscription, start, end));
+    if (type === 'all' || type === 'ticket')       area.appendChild(buildTicketReport(res.ticket, start, end));
+
+  } catch(e) {
+    area.innerHTML = `<div class="empty" style="color:var(--red)">❌ ${esc(e.message)}</div>`;
+  }
+}
+
+function buildPrepaidReport(data, start, end) {
+  if (!data) return document.createElement('div');
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div class="card">
+      <div class="card-title">💰 プリペイド集計（${start}〜${end}）</div>
+      <div class="table-wrap" style="margin-bottom:20px">
+        <table>
+          <thead><tr><th>項目</th><th>件数</th><th>金額・ポイント</th></tr></thead>
+          <tbody>
+            <tr><td>入金合計</td><td>${data.payment_count}件</td><td>${Number(data.total_payment).toLocaleString()}円</td></tr>
+            <tr><td>付与ポイント合計（ボーナス）</td><td>-</td><td>${Number(data.total_bonus).toLocaleString()}pt</td></tr>
+            <tr><td>使用合計</td><td>${data.usage_count}件</td><td>${Number(data.total_usage).toLocaleString()}pt</td></tr>
+            <tr><td>残高保有者数</td><td>${data.balance_list.length}名</td><td>-</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      ${data.near_expiry_list.length ? `
+      <div style="margin-bottom:16px">
+        <div style="font-weight:700;margin-bottom:8px;color:var(--red)">⚠️ 期限切れ間近（30日以内）${data.near_expiry_list.length}名</div>
+        ${buildSimpleTable(['患者番号','患者名','残高','有効期限'],
+          data.near_expiry_list.map(p=>[p.patient_number, p.patient_name, Number(p.balance).toLocaleString()+'pt', p.expiry]))}
+      </div>` : ''}
+
+      ${data.expired_list.length ? `
+      <div style="margin-bottom:16px">
+        <div style="font-weight:700;margin-bottom:8px;color:var(--red)">⛔ 期限切れ ${data.expired_list.length}名</div>
+        ${buildSimpleTable(['患者番号','患者名','残高','有効期限'],
+          data.expired_list.map(p=>[p.patient_number, p.patient_name, Number(p.balance).toLocaleString()+'pt', p.expiry]))}
+      </div>` : ''}
+
+      <div style="font-weight:700;margin-bottom:8px">患者別明細</div>
+      ${buildSimpleTable(['患者番号','患者名','入金額','付与pt','使用pt','現在残高','有効期限'],
+        data.patient_detail.map(p=>[p.patient_number, p.patient_name,
+          Number(p.payment).toLocaleString()+'円', Number(p.bonus).toLocaleString()+'pt',
+          Number(p.usage).toLocaleString()+'pt', Number(p.balance).toLocaleString()+'pt', p.expiry]))}
+    </div>`;
+  return div;
+}
+
+function buildSubReport(data, start, end) {
+  if (!data) return document.createElement('div');
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div class="card">
+      <div class="card-title">🔄 サブスク集計（${start}〜${end}）</div>
+      <div class="table-wrap" style="margin-bottom:20px">
+        <table>
+          <thead><tr><th>項目</th><th>件数・金額</th></tr></thead>
+          <tbody>
+            <tr><td>継続件数</td><td>${data.renewal_count}件</td></tr>
+            <tr><td>継続金額合計</td><td>${Number(data.renewal_amount).toLocaleString()}円</td></tr>
+            <tr><td>契約中</td><td>${data.active_list.length}件</td></tr>
+            <tr><td>停止・終了</td><td>${data.stopped_list.length + data.ended_list.length}件</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      ${data.near_expiry_list.length ? `
+      <div style="margin-bottom:16px">
+        <div style="font-weight:700;margin-bottom:8px;color:#B8860B">⚠️ 期限切れ間近（30日以内）${data.near_expiry_list.length}件</div>
+        ${buildSimpleTable(['患者番号','患者名','商品名','有効期限'],
+          data.near_expiry_list.map(s=>[s.patient_number,s.patient_name,s.product_name,s.expiry_date]))}
+      </div>` : ''}
+
+      <div style="font-weight:700;margin-bottom:8px">契約中一覧</div>
+      ${buildSimpleTable(['患者番号','患者名','商品名','有効期限'],
+        data.active_list.map(s=>[s.patient_number,s.patient_name,s.product_name,s.expiry_date]))}
+
+      ${data.patient_detail.length ? `
+      <div style="margin-top:16px;font-weight:700;margin-bottom:8px">患者別継続明細</div>
+      ${buildSimpleTable(['患者番号','患者名','継続回数','継続金額'],
+        data.patient_detail.map(p=>[p.patient_number,p.patient_name,p.renewal_count+'回',Number(p.renewal_amount).toLocaleString()+'円']))}
+      ` : ''}
+    </div>`;
+  return div;
+}
+
+function buildTicketReport(data, start, end) {
+  if (!data) return document.createElement('div');
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div class="card">
+      <div class="card-title">🎫 回数券集計（${start}〜${end}）</div>
+      <div class="table-wrap" style="margin-bottom:20px">
+        <table>
+          <thead><tr><th>項目</th><th>件数・回数</th></tr></thead>
+          <tbody>
+            <tr><td>販売件数</td><td>${data.purchase_count}件</td></tr>
+            <tr><td>販売回数合計</td><td>${data.purchase_amount}回</td></tr>
+            <tr><td>使用回数合計</td><td>${data.usage_count}回</td></tr>
+            <tr><td>残回数保有者数</td><td>${data.balance_list.length}名</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      ${data.near_expiry_list.length ? `
+      <div style="margin-bottom:16px">
+        <div style="font-weight:700;margin-bottom:8px;color:#B8860B">⚠️ 期限切れ間近（30日以内）${data.near_expiry_list.length}件</div>
+        ${buildSimpleTable(['患者番号','患者名','商品名','残回数','有効期限'],
+          data.near_expiry_list.map(t=>[t.patient_number,t.patient_name,t.product_name,t.remaining_count+'回',t.expiry_date]))}
+      </div>` : ''}
+
+      <div style="font-weight:700;margin-bottom:8px">残回数一覧</div>
+      ${buildSimpleTable(['患者番号','患者名','商品名','残回数','有効期限'],
+        data.balance_list.map(t=>[t.patient_number,t.patient_name,t.product_name,t.remaining_count+'回',t.expiry_date]))}
+
+      ${data.patient_detail.length ? `
+      <div style="margin-top:16px;font-weight:700;margin-bottom:8px">患者別明細</div>
+      ${buildSimpleTable(['患者番号','患者名','購入件数','購入回数','使用回数'],
+        data.patient_detail.map(p=>[p.patient_number,p.patient_name,p.purchase_count+'件',p.purchase_amount+'回',p.usage_count+'回']))}
+      ` : ''}
+    </div>`;
+  return div;
+}
+
+function buildSimpleTable(headers, rows) {
+  if (!rows.length) return '<div class="empty" style="font-size:.85rem">データがありません</div>';
+  return `<div class="table-wrap"><table>
+    <thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${esc(String(c||''))}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+// CSV出力
+function exportCSV() {
+  if (!lastSummaryData) return showToast('先に集計してください','error');
+  const { res, start, end, type } = lastSummaryData;
+  let csvContent = '';
+  const BOM = '﻿';
+
+  if ((type==='all'||type==='prepaid') && res.prepaid) {
+    csvContent += `プリペイド集計（${start}〜${end}）\n`;
+    csvContent += '入金合計,付与pt合計,使用合計\n';
+    csvContent += `${res.prepaid.total_payment},${res.prepaid.total_bonus},${res.prepaid.total_usage}\n\n`;
+    csvContent += '患者番号,患者名,入金額,付与pt,使用pt,現在残高,有効期限\n';
+    res.prepaid.patient_detail.forEach(p => {
+      csvContent += `${p.patient_number},"${p.patient_name}",${p.payment},${p.bonus},${p.usage},${p.balance},${p.expiry}\n`;
+    });
+    csvContent += '\n';
+  }
+  if ((type==='all'||type==='subscription') && res.subscription) {
+    csvContent += `サブスク集計（${start}〜${end}）\n`;
+    csvContent += '継続件数,継続金額\n';
+    csvContent += `${res.subscription.renewal_count},${res.subscription.renewal_amount}\n\n`;
+    csvContent += '患者番号,患者名,商品名,有効期限,ステータス\n';
+    res.subscription.active_list.forEach(s => {
+      csvContent += `${s.patient_number},"${s.patient_name}","${s.product_name}",${s.expiry_date},${s.status}\n`;
+    });
+    csvContent += '\n';
+  }
+  if ((type==='all'||type==='ticket') && res.ticket) {
+    csvContent += `回数券集計（${start}〜${end}）\n`;
+    csvContent += '販売件数,販売回数,使用回数\n';
+    csvContent += `${res.ticket.purchase_count},${res.ticket.purchase_amount},${res.ticket.usage_count}\n\n`;
+    csvContent += '患者番号,患者名,商品名,残回数,有効期限\n';
+    res.ticket.balance_list.forEach(t => {
+      csvContent += `${t.patient_number},"${t.patient_name}","${t.product_name}",${t.remaining_count},${t.expiry_date}\n`;
+    });
+  }
+
+  const blob = new Blob([BOM + csvContent], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `たいよう集計_${start}_${end}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSVをダウンロードしました','success');
+}
+
+// =============================================
+// 支払い方法マスター
+// =============================================
+async function loadPaymentMethodsList() {
+  try {
+    const res = await callGas('getPaymentMethods', {});
+    APP.paymentMethods = res.methods || [];
+    // 各セレクトボックスに反映
+    const selIds = ['pay-method','sub-new-method','sub-renew-method','ticket-pay-method'];
+    selIds.forEach(id => {
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      const current = sel.value;
+      sel.innerHTML = '<option value="">-- 選択 --</option>';
+      APP.paymentMethods.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.method_name;
+        opt.textContent = m.method_name;
+        sel.appendChild(opt);
+      });
+      if (current) sel.value = current;
+    });
+  } catch(e) {}
+}
+
+async function loadPaymentMethodsMaster() {
+  const area = document.getElementById('payment-methods-area');
+  if (!area) return;
+  try {
+    const res = await callGas('getPaymentMethods', {});
+    const methods = res.methods || [];
+    if (!methods.length) { area.innerHTML='<div class="empty">支払い方法が登録されていません</div>'; return; }
+    const ul = document.createElement('ul');
+    ul.style.cssText = 'list-style:none';
+    methods.forEach(m => {
+      const li = document.createElement('li');
+      li.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--sun-light)';
+      li.innerHTML = `
+        <div style="flex:1;display:flex;align-items:center;gap:10px">
+          <span style="color:var(--text-sub);font-size:.82rem;min-width:20px">${m.sort_order||'-'}</span>
+          <span style="font-weight:700">${esc(m.method_name)}</span>
+          <span class="badge ${m.active===false||String(m.active)==='false'?'badge-gray':'badge-ok'}">${m.active===false||String(m.active)==='false'?'非表示':'表示中'}</span>
+        </div>
+        <button class="btn btn-sm btn-outline pm-edit-btn">編集</button>`;
+      li.querySelector('.pm-edit-btn').addEventListener('click', () => openPaymentMethodModal(m));
+      ul.appendChild(li);
+    });
+    area.innerHTML = '';
+    area.appendChild(ul);
+  } catch(e) { area.innerHTML=`<div class="empty" style="color:var(--red)">❌ ${esc(e.message)}</div>`; }
+}
+
+function openPaymentMethodModal(method) {
+  APP.editingPaymentMethod = method;
+  document.getElementById('modal-pm-title').textContent = method ? '支払い方法編集' : '支払い方法登録';
+  document.getElementById('pm-name').value = method ? method.method_name : '';
+  document.getElementById('pm-sort').value = method ? (method.sort_order||'') : '';
+  document.getElementById('pm-active').value = method ? String(method.active!==false&&method.active!=='false') : 'true';
+  document.getElementById('pm-memo').value = method ? (method.memo||'') : '';
+  document.getElementById('modal-payment-method').classList.remove('hidden');
+}
+
+async function savePaymentMethod() {
+  const name = document.getElementById('pm-name').value.trim();
+  if (!name) return showToast('支払い方法名を入力してください','error');
+  const data = {
+    method_name: name,
+    sort_order: parseInt(document.getElementById('pm-sort').value)||99,
+    active: document.getElementById('pm-active').value === 'true',
+    memo: document.getElementById('pm-memo').value,
+  };
+  if (APP.editingPaymentMethod) data.method_id = APP.editingPaymentMethod.method_id;
+  try {
+    await callGas('savePaymentMethod', data);
+    closeModal('modal-payment-method');
+    showToast('保存しました','success');
+    await loadPaymentMethodsList();
+    loadPaymentMethodsMaster();
+  } catch(e) { showToast(e.message,'error'); }
+}
+</script>
+</body>
+</html>
